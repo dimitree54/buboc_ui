@@ -9,3 +9,8 @@ shared/shared.podspec
 /kotlin-js-store/
 /.gradle/
 /shared/build/cocoapods/framework/shared.framework/
+/androidApp/build/
+/build/
+/desktopApp/build/
+/jsApp/build/
+/shared/build/
