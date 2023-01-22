@@ -14,3 +14,9 @@ shared/shared.podspec
 /desktopApp/build/
 /jsApp/build/
 /shared/build/
+/androidBUBOC/build/
+/desktopBUBOC/build/
+/jsBUBOC/build/
+/sharedBUBOC/build/
+/sharedBUBOC/shared.podspec
+/sharedBUBOC/sharedBUBOC.podspec
