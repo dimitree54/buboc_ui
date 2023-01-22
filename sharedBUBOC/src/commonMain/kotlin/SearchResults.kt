@@ -3,7 +3,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,13 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal inline fun Messages(messages: List<Message>) {
+internal inline fun SearchResults(messages: List<Message>) {
     val listState = rememberLazyListState()
-    if (messages.isNotEmpty()) {
-        LaunchedEffect(messages.last()) {
-            listState.animateScrollToItem(messages.lastIndex, scrollOffset = 2)
-        }
-    }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -40,17 +34,14 @@ internal inline fun Messages(messages: List<Message>) {
     ) {
         messages.forEach { message ->
             item(key = message.id) {
-                ChatMessage(isMyMessage = message.user == myUser, message)
+                SearchResult(isMyMessage = false, message)
             }
         }
-//        items(messages, key = { it.id }) { message -> //TODO not working in JS
-//            ChatMessage(isMyMessage = message.user == myUser, message)
-//        }
     }
 }
 
 @Composable
-private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
+private inline fun SearchResult(isMyMessage: Boolean, message: Message) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier.padding(4.dp)
