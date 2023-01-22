@@ -1,4 +1,4 @@
-package org.jetbrains.chat
+package we.rashchenko.buboc
 
 import android.os.Bundle
 import androidx.activity.compose.setContent

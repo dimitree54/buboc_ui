@@ -5,7 +5,7 @@ import androidx.compose.ui.window.singleWindowApplication
 
 fun main() =
     singleWindowApplication(
-        title = "Chat",
+        title = "BUBOC",
         state = WindowState(size = DpSize(500.dp, 800.dp))
     ) {
         MainView()

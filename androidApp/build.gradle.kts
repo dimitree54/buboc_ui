@@ -20,7 +20,7 @@ kotlin {
 android {
     compileSdk = 33
     defaultConfig {
-        applicationId = "org.jetbrains.Chat"
+        applicationId = "we.rashchenko.buboc"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
