@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -18,7 +19,7 @@ enum class SearchType {
 }
 
 @Composable
-internal fun SearchField(searchType: SearchType, sendMessage: (String) -> Unit) {
+internal fun SearchField(searchType: SearchType, search: (String) -> Unit) {
     var inputText by remember { mutableStateOf("") }
     TextField(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background).padding(10.dp),
         value = inputText,
@@ -35,7 +36,10 @@ internal fun SearchField(searchType: SearchType, sendMessage: (String) -> Unit) 
         },
         trailingIcon = {
             Icon(
-                imageVector = Icons.Default.Search, contentDescription = "Send", tint = MaterialTheme.colors.primary
+                modifier = Modifier.clickable { search(inputText) },
+                imageVector = Icons.Default.Search,
+                contentDescription = "Send",
+                tint = MaterialTheme.colors.primary
             )
         })
 }
