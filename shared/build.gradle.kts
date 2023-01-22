@@ -19,21 +19,6 @@ kotlin {
         browser()
     }
 
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-
     cocoapods {
         summary = "Shared code for the sample"
         homepage = "https://github.com/JetBrains/compose-jb"
@@ -55,44 +40,22 @@ kotlin {
                 implementation(compose.runtime)
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
+
         val androidMain by getting {
             dependencies {
                 implementation("com.google.android.material:material:1.7.0")
             }
         }
-        val androidTest by getting {
-            dependencies {
-                implementation("junit:junit:4.13.2")
-            }
-        }
+
         val iosMain by getting
-        val iosTest by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
         }
 
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
             }
-        }
-
-        val macosMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
         }
     }
 }
