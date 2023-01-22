@@ -13,7 +13,7 @@ import utility.MeasureUnit
 
 @Composable
 internal fun BubocApp() {
-    val coroutineScope = rememberCoroutineScope()
+    // val coroutineScope = rememberCoroutineScope()
     // val store = remember { coroutineScope.createStore() }
     // val state by store.stateFlow.collectAsState()
     val potato = Resource("", Ingredient("Potato", MeasureUnit("kg")), 5.0)
