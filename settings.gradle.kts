@@ -22,7 +22,7 @@ pluginManagement {
 
 rootProject.name = "buboc_ui"
 
-include(":androidApp")
-include(":shared")
-include(":desktopApp")
-include(":jsApp")
+include(":androidBUBOC")
+include(":sharedBUBOC")
+include(":desktopBUBOC")
+include(":jsBUBOC")

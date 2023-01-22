@@ -23,9 +23,9 @@ kotlin {
         summary = "Shared code for the sample"
         homepage = "https://github.com/JetBrains/compose-jb"
         ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
+        podfile = project.file("../iosBUBOC/Podfile")
         framework {
-            baseName = "shared"
+            baseName = "sharedBUBOC"
             isStatic = true
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"

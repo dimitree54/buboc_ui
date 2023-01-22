@@ -1,5 +1,5 @@
 import UIKit
-import shared
+import sharedBUBOC
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
