@@ -20,7 +20,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "chat-mpp"
+rootProject.name = "buboc_ui"
 
 include(":androidApp")
 include(":shared")
