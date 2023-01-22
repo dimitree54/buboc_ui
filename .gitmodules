@@ -1,3 +1,6 @@
 [submodule "ui_blocks"]
 	path = ui_blocks
 	url = git@github.com:dimitree54/ui_blocks.git
+[submodule "cuboc_core"]
+	path = cuboc_core
+	url = git@github.com:dimitree54/cuboc_core.git
