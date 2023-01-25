@@ -1,12 +1,9 @@
 package entry
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.graphics.Color
 import cuboc.ingredient.RecipeInput
-import cuboc.ingredient.Resource
 import kotlin.random.Random
 
 class RecipeInputInstance(

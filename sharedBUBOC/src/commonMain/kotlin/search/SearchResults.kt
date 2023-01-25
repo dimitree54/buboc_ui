@@ -20,7 +20,7 @@ internal fun SearchResultsList(results: List<Instance>, stack: MutableList<Any>)
     ) {
         results.forEach { result ->
             item(key = result.id) {
-                InstancePreview(result){
+                InstancePreview(result) {
                     stack.add(result.obj)
                 }
             }

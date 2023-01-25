@@ -2,7 +2,6 @@ package entry
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.Color
 import cuboc.ingredient.Resource
 import kotlin.random.Random
