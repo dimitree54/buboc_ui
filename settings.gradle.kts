@@ -22,7 +22,6 @@ pluginManagement {
 
 rootProject.name = "buboc_ui"
 
-include(":ui_blocks")
 include(":cuboc_core")
 include(":sharedBUBOC")
 include(":androidBUBOC")

@@ -35,7 +35,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":cuboc_core"))
-                implementation(project(":ui_blocks"))
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material)
