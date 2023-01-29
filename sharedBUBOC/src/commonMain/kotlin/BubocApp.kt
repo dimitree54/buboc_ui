@@ -35,20 +35,6 @@ enum class CreateState {
 }
 
 @Composable
-internal fun MyButton(
-    text: String,
-    onClick: () -> Unit
-) {
-    Button(
-        shape = RoundedCornerShape(50),
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        onClick = onClick
-    ) {
-        Text(text)
-    }
-}
-
-@Composable
 internal fun ActionButtons(
     onCreateRecipe: () -> Unit,
     onCreateResource: () -> Unit

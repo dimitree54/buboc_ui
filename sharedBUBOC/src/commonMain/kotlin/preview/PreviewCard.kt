@@ -8,7 +8,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -19,8 +18,7 @@ internal fun PreviewCard(name: String, info: String, icon: ImageVector) {
         Icon(
             modifier = Modifier.size(50.dp),
             imageVector = icon,
-            contentDescription = "Result icon",
-            tint = Color.Black
+            contentDescription = "Result icon"
         )
         Column {
             Text(
