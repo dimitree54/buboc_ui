@@ -1,5 +1,6 @@
 package view
 
+import DeleteButton
 import RECIPE_ICON
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +18,10 @@ import preview.PreviewRecipeOutputCard
 
 
 @Composable
-internal fun ViewRecipe(recipe: Recipe) {
+internal fun ViewRecipe(
+    recipe: Recipe,
+    onDelete: () -> Unit
+) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -48,5 +52,6 @@ internal fun ViewRecipe(recipe: Recipe) {
         recipe.outputs.forEach {
             PreviewRecipeOutputCard(it)
         }
+        DeleteButton(false, onDelete)
     }
 }

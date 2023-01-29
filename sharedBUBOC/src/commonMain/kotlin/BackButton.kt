@@ -91,10 +91,11 @@ internal fun SearchOrCreateIngredient(
 
 @Composable
 internal fun DeleteButton(
+    compact: Boolean = false,
     onDelete: () -> Unit
 ) {
     Button(
-        modifier = Modifier.size(50.dp),
+        modifier = if (compact) Modifier.size(50.dp) else Modifier,
         shape = RoundedCornerShape(50),
         onClick = onDelete,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
@@ -105,5 +106,6 @@ internal fun DeleteButton(
             contentDescription = null,
             tint = Color.White
         )
+        if (!compact) Text("Delete", style = MaterialTheme.typography.h6)
     }
 }

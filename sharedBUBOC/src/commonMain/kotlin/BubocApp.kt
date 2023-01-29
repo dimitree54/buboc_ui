@@ -95,6 +95,7 @@ internal fun Main(database: FakeDatabase) {
                         searchForIngredient = database::search,
                         onCancel = { state.value = BubocState.SEARCH },
                         onCreation = { ingredient, amount ->
+                            searchResults.clear()
                             database.addResource(ingredient, amount)
                             state.value = BubocState.SEARCH
                         }
@@ -104,6 +105,7 @@ internal fun Main(database: FakeDatabase) {
                         searchForIngredient = database::search,
                         onCancel = { state.value = BubocState.SEARCH },
                         onCreation = { recipe ->
+                            searchResults.clear()
                             database.addRecipe(recipe)
                             state.value = BubocState.SEARCH
                         }
@@ -116,8 +118,18 @@ internal fun Main(database: FakeDatabase) {
             BubocState.VIEW -> {
                 BackButton { state.value = BubocState.SEARCH }
                 when (val item = viewItem.value) {
-                    is ResourceSearchResult -> ViewResource(item.resource)
-                    is RecipeSearchResult -> ViewRecipe(item.recipe)
+                    is ResourceSearchResult -> ViewResource(item.resource) {
+                        searchResults.clear()
+                        database.removeResource(item.resource)
+                        state.value = BubocState.SEARCH
+                    }
+
+                    is RecipeSearchResult -> ViewRecipe(item.recipe) {
+                        searchResults.clear()
+                        database.removeRecipe(item.recipe)
+                        state.value = BubocState.SEARCH
+                    }
+
                     else -> throw IllegalStateException("Unsupported by viewer search result type")
                 }
             }

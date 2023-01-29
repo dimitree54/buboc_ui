@@ -135,7 +135,7 @@ internal fun CreateRecipeForm(
     Text(text = "Inputs:", style = MaterialTheme.typography.h5)
     recipeInputPrototypes.forEachIndexed { index, recipeInputPrototype ->
         Row(modifier = Modifier.fillMaxWidth()) {
-            DeleteButton {
+            DeleteButton(true) {
                 recipeInputPrototypes.removeAt(index)
             }
             EditRecipeInputPrototype(recipeInputPrototype) {
@@ -166,7 +166,7 @@ internal fun CreateRecipeForm(
     )
     Text(text = "Outputs:", style = MaterialTheme.typography.h5)
     recipeOutputPrototypes.forEachIndexed { index, recipeOutputPrototype ->
-        DeleteButton {
+        DeleteButton(true) {
             recipeInputPrototypes.removeAt(index)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

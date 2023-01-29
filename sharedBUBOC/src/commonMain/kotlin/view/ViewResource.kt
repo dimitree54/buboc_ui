@@ -1,5 +1,6 @@
 package view
 
+import DeleteButton
 import RESOURCE_ICON
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +17,10 @@ import preview.PreviewIngredientCard
 
 
 @Composable
-internal fun ViewResource(resource: Resource) {
+internal fun ViewResource(
+    resource: Resource,
+    onDelete: () -> Unit
+) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -36,5 +40,6 @@ internal fun ViewResource(resource: Resource) {
         PreviewIngredientCard(resource.ingredient)
         Text("Amount:", style = MaterialTheme.typography.h5)
         Text(resource.amount.toString() + " " + resource.ingredient.measureUnit.name)
+        DeleteButton(false, onDelete)
     }
 }

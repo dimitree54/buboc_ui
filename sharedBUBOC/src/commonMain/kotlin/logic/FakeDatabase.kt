@@ -73,4 +73,12 @@ class FakeDatabase {
             else -> TODO()
         }
     }
+
+    fun removeResource(resource: Resource) {
+        resources.remove(resource)
+    }
+
+    fun removeRecipe(recipe: Recipe) {
+        recipes.remove(recipe)
+    }
 }
