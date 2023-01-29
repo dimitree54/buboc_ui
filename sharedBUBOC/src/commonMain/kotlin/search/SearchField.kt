@@ -2,7 +2,6 @@ package search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import logic.SearchRequest
 import logic.SearchType
 
@@ -23,7 +21,7 @@ internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit
     val inputText = remember { mutableStateOf("") }
     TextField(
         shape = RoundedCornerShape(50),
-        modifier = Modifier.fillMaxWidth().padding(10.dp),
+        modifier = Modifier.fillMaxWidth(),
         value = inputText.value,
         placeholder = {
             val placeholderText = when (searchType) {

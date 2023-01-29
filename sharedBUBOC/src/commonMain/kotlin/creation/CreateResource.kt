@@ -1,8 +1,10 @@
 package creation
 
+import BackButton
 import RESOURCE_ICON
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -46,60 +48,66 @@ internal fun CreateResourceForm(
                 tint = Color.Black
             )
             Text(
-                text = "Create resource", style = MaterialTheme.typography.h4
+                text = "Create resource", style = MaterialTheme.typography.h3
             )
         }
         Text(
-            text = "Ingredient: ",
-            style = MaterialTheme.typography.h5
+            text = "Ingredient: ", style = MaterialTheme.typography.h5
         )
         if (ingredient != null) {
-            Button(onClick = onIngredientSearch) {
+            Button(
+                shape = RoundedCornerShape(50),
+                onClick = onIngredientSearch
+            ) {
                 Row {
                     Icon(
-                        modifier = Modifier.size(50.dp),
                         imageVector = Icons.Default.Refresh,
                         contentDescription = null,
-                        tint = Color.Black
                     )
-                    Text(ingredient.name + " (measured in " + ingredient.measureUnit.name + ")")
+                    Text(ingredient.name, style = MaterialTheme.typography.h6)
                 }
             }
-        } else {
-            Button(onClick = onIngredientSearch) {
-                Row {
-                    Icon(
-                        modifier = Modifier.size(50.dp),
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                    Text(text = "search")
-                }
-            }
-        }
-        Row {
             Text(
-                text = "Amount: ",
+                text = "Amount(in ${ingredient.measureUnit.name}): ",
                 style = MaterialTheme.typography.h5
             )
             TextField(
                 amountText.value,
+                modifier = Modifier.width(60.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(25),
                 onValueChange = { amountText.value = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
+        } else {
+            Button(
+                shape = RoundedCornerShape(50),
+                onClick = onIngredientSearch
+            ) {
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                    Text(text = "Search", style = MaterialTheme.typography.h6)
+                }
+            }
         }
     }
 }
 
 @Composable
 internal fun DynamicSaveButton(amount: Double?, ingredient: Ingredient?, onCreation: (Ingredient, Double) -> Unit) {
-    if (amount != null && ingredient != null) {
-        Button(onClick = {
-            onCreation(ingredient, amount)
-        }) {
-            Text("Save")
-        }
+    val allOk = amount != null && ingredient != null
+    Button(
+        shape = RoundedCornerShape(50),
+        onClick = {
+            if (allOk) {
+                onCreation(ingredient!!, amount!!)
+            }
+        }, enabled = allOk
+    ) {
+        Text("Save", style = MaterialTheme.typography.h6)
     }
 }
 
@@ -114,12 +122,10 @@ internal fun CreateResource(
     val chosenIngredient = remember { mutableStateOf<Ingredient?>(null) }
 
     val searchResults = remember { mutableStateListOf<SearchResult>() }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         when (state.value) {
             ResourceCreationState.FILLING_FORM -> {
-                Button(onClick = onCancel) {
-                    Text("Back")
-                }
+                BackButton(onCancel)
                 CreateResourceForm(chosenIngredient.value, amountText) {
                     state.value = ResourceCreationState.INGREDIENT_SEARCH
                 }
@@ -127,14 +133,15 @@ internal fun CreateResource(
             }
 
             ResourceCreationState.INGREDIENT_SEARCH -> {
-                Button(onClick = { state.value = ResourceCreationState.FILLING_FORM }) {
-                    Text("Back")
+                BackButton { state.value = ResourceCreationState.FILLING_FORM }
+                Button(
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        state.value = ResourceCreationState.INGREDIENT_CREATION
+                    }) {
+                    Text("Create new ingredient", style = MaterialTheme.typography.h6)
                 }
-                Button(onClick = {
-                    state.value = ResourceCreationState.INGREDIENT_CREATION
-                }) {
-                    Text("Create ingredient")
-                }
+                Text("Or search for existing ingredient: ")
                 SearchField(SearchType.Ingredients) {
                     searchResults.clear()
                     searchResults.addAll(searchForIngredient(it))
@@ -148,9 +155,7 @@ internal fun CreateResource(
             }
 
             ResourceCreationState.INGREDIENT_CREATION -> {
-                Button(onClick = { state.value = ResourceCreationState.FILLING_FORM }) {
-                    Text("Back")
-                }
+                BackButton { state.value = ResourceCreationState.FILLING_FORM }
                 CreateIngredient {
                     chosenIngredient.value = it
                     state.value = ResourceCreationState.FILLING_FORM
