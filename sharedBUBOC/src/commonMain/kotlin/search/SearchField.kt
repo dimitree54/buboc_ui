@@ -38,13 +38,18 @@ internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit
             inputText.value = it
         },
         trailingIcon = {
-            Icon(
-                modifier = Modifier.clickable {
-                    if (inputText.value.isNotBlank()) {
-                        search(SearchRequest(inputText.value, searchType))
-                    }
-                }, imageVector = Icons.Default.Search, contentDescription = null
-            )
+            if (inputText.value.isNotBlank()) {
+                Icon(
+                    modifier = Modifier.clickable {
+                        if (inputText.value.isNotBlank()) {
+                            search(SearchRequest(inputText.value, searchType))
+                        }
+                    }, imageVector = Icons.Default.Search, contentDescription = null
+                )
+            } else {
+                Icon(imageVector = Icons.Default.Search, contentDescription = null)
+            }
+
         },
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(
