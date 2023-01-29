@@ -31,14 +31,12 @@ internal fun ViewResource(resource: Resource) {
                 tint = Color.Black
             )
             Text(
-                text = "Resource", style = MaterialTheme.typography.h4
+                text = resource.ingredient.name, style = MaterialTheme.typography.h3
             )
         }
-        Text(
-            text = resource.ingredient.name, style = MaterialTheme.typography.h5
-        )
-        Text(resource.amount.toString() + " " + resource.ingredient.measureUnit.name)
-        Text("Ingredient: ")
+        Text("Ingredient: ", style = MaterialTheme.typography.h5)
         PreviewIngredientCard(resource.ingredient)
+        Text("Amount:", style = MaterialTheme.typography.h5)
+        Text(resource.amount.toString() + " " + resource.ingredient.measureUnit.name)
     }
 }
