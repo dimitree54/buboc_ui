@@ -1,8 +1,6 @@
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -37,6 +35,43 @@ enum class CreateState {
 }
 
 @Composable
+internal fun MyButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        onClick = onClick
+    ) {
+        Text(text)
+    }
+}
+
+@Composable
+internal fun ActionButtons(
+    onCreateRecipe: () -> Unit,
+    onCreateResource: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Button(
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.weight(1f),
+            onClick = onCreateRecipe
+        ) {
+            Text("New recipe")
+        }
+        Button(
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.weight(1f),
+            onClick = onCreateResource
+        ) {
+            Text("New resource")
+        }
+    }
+}
+
+@Composable
 internal fun Main(database: FakeDatabase) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
@@ -48,22 +83,16 @@ internal fun Main(database: FakeDatabase) {
     ) {
         when (state.value) {
             BubocState.SEARCH -> {
-                Row {
-                    Button(modifier = Modifier.padding(8.dp),
-                        onClick = {
-                            createState.value = CreateState.Recipe
-                            state.value = BubocState.CREATE
-                        }) {
-                        Text("New recipe")
+                ActionButtons(
+                    onCreateRecipe = {
+                        createState.value = CreateState.Recipe
+                        state.value = BubocState.CREATE
+                    },
+                    onCreateResource = {
+                        createState.value = CreateState.Resource
+                        state.value = BubocState.CREATE
                     }
-                    Button(modifier = Modifier.padding(8.dp),
-                        onClick = {
-                            createState.value = CreateState.Resource
-                            state.value = BubocState.CREATE
-                        }) {
-                        Text("New resource")
-                    }
-                }
+                )
                 SearchField(SearchType.All) {
                     searchResults.clear()
                     searchResults.addAll(database.search(it))
