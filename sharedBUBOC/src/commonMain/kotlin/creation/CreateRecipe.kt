@@ -1,13 +1,20 @@
 package creation
 
+import BackButton
+import DeleteButton
 import RECIPE_ICON
+import SaveButton
+import SearchOrCreateIngredient
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,19 +25,79 @@ import cuboc.ingredient.RecipeInput
 import cuboc.ingredient.RecipeOutput
 import cuboc.recipe.Instruction
 import cuboc.recipe.Recipe
-import logic.IngredientSearchResult
 import logic.SearchRequest
 import logic.SearchResult
-import logic.SearchType
-import search.SearchField
-import search.SearchResultsList
 
 enum class RecipeCreationState {
     FILLING_FORM,
-    INPUT_INGREDIENT_SEARCH,
-    INPUT_INGREDIENT_CREATION,
-    OUTPUT_INGREDIENT_SEARCH,
-    OUTPUT_INGREDIENT_CREATION
+    REQUEST_INPUT_INGREDIENT,
+    REQUEST_OUTPUT_INGREDIENT
+}
+
+data class RecipeInputPrototype(
+    val ingredient: Ingredient,
+    val amountText: String = "",
+    val scalable: Boolean = false
+) {
+
+    fun toRecipeInput(): RecipeInput? {
+        val amount = amountText.toDoubleOrNull() ?: return null
+        if (amount <= 0) return null
+        return RecipeInput(
+            ingredient,
+            amount,
+            scalable
+        )
+    }
+
+    fun toRecipeOutput(): RecipeOutput? {
+        val amount = amountText.toDoubleOrNull() ?: return null
+        if (amount <= 0) return null
+        return RecipeOutput(
+            ingredient,
+            amount,
+            scalable
+        )
+    }
+}
+
+@Composable
+internal fun EditRecipeInputPrototype(
+    recipeOutputPrototype: RecipeInputPrototype,
+    onChange: (RecipeInputPrototype) -> Unit
+) {
+    Box(modifier = Modifier.border(BorderStroke(2.dp, Color.Black))) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(recipeOutputPrototype.ingredient.name, style = MaterialTheme.typography.h6)
+            Text("Amount (in ${recipeOutputPrototype.ingredient.measureUnit.name}): ")
+            TextField(
+                recipeOutputPrototype.amountText,
+                onValueChange = {
+                    val newPrototype = RecipeInputPrototype(
+                        recipeOutputPrototype.ingredient,
+                        it,
+                        recipeOutputPrototype.scalable
+                    )
+                    onChange(newPrototype)
+                },
+                singleLine = true,
+            )
+            Row {
+                Text("Scalable:")
+                Checkbox(
+                    checked = recipeOutputPrototype.scalable,
+                    onCheckedChange = {
+                        val newPrototype = RecipeInputPrototype(
+                            recipeOutputPrototype.ingredient,
+                            recipeOutputPrototype.amountText,
+                            it
+                        )
+                        onChange(newPrototype)
+                    }
+                )
+            }
+        }
+    }
 }
 
 
@@ -38,7 +105,7 @@ enum class RecipeCreationState {
 internal fun CreateRecipeForm(
     recipeName: MutableState<String>,
     recipeInputPrototypes: MutableList<RecipeInputPrototype>,
-    recipeOutputPrototypes: MutableList<RecipeOutputPrototype>,
+    recipeOutputPrototypes: MutableList<RecipeInputPrototype>,
     durationMinutesText: MutableState<String>,
     instructionsText: MutableState<String>,
     onInputAdd: () -> Unit,
@@ -52,180 +119,66 @@ internal fun CreateRecipeForm(
             tint = Color.Black
         )
         Text(
-            text = "Create recipe", style = MaterialTheme.typography.h4
+            text = "Create recipe", style = MaterialTheme.typography.h3
         )
     }
-    Row {
-        Text(
-            text = "Name: ",
-            style = MaterialTheme.typography.h5
-        )
-        TextField(
-            recipeName.value,
-            onValueChange = { recipeName.value = it }
-        )
-    }
-    Text(text = "Inputs:")
+    Text(
+        text = "Name: ",
+        style = MaterialTheme.typography.h5
+    )
+    TextField(
+        recipeName.value,
+        singleLine = true,
+        shape = RoundedCornerShape(25),
+        onValueChange = { recipeName.value = it }
+    )
+    Text(text = "Inputs:", style = MaterialTheme.typography.h5)
     recipeInputPrototypes.forEachIndexed { index, recipeInputPrototype ->
         Row(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = { recipeInputPrototypes.remove(recipeInputPrototype) }) {
-                Icon(
-                    modifier = Modifier.size(50.dp),
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = Color.Black
-                )
+            DeleteButton {
+                recipeInputPrototypes.removeAt(index)
             }
-            Text(recipeInputPrototype.ingredient.name)
-        }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                recipeInputPrototype.amountText,
-                onValueChange = {
-                    val newPrototype = RecipeInputPrototype(
-                        recipeInputPrototype.ingredient,
-                        it,
-                        recipeInputPrototype.scalable
-                    )
-                    recipeInputPrototypes[index] = newPrototype
-                })
-            Text(recipeInputPrototype.ingredient.measureUnit.name)
-        }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text("Scalable: ")
-            Checkbox(
-                checked = recipeInputPrototype.scalable,
-                onCheckedChange = {
-                    val newPrototype = RecipeInputPrototype(
-                        recipeInputPrototype.ingredient,
-                        recipeInputPrototype.amountText,
-                        it
-                    )
-                    recipeInputPrototypes[index] = newPrototype
-                }
-            )
+            EditRecipeInputPrototype(recipeInputPrototype) {
+                recipeInputPrototypes[index] = it
+            }
         }
     }
-    Button(onClick = onInputAdd) {
-        Text("Add input")
+    Button(shape = RoundedCornerShape(50), onClick = onInputAdd) {
+        Row {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            Text("Add input", style = MaterialTheme.typography.h6)
+        }
     }
-    Row {
-        Text(
-            text = "Duration in minutes: ",
-            style = MaterialTheme.typography.h5
-        )
-        TextField(
-            durationMinutesText.value,
-            onValueChange = { durationMinutesText.value = it },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-    }
-    Row {
-        Text(
-            text = "Instructions: ",
-            style = MaterialTheme.typography.h5
-        )
-        TextField(
-            instructionsText.value,
-            onValueChange = { instructionsText.value = it }
-        )
-    }
-    Text(text = "Outputs:")
+    Text("Duration in minutes: ", style = MaterialTheme.typography.h5)
+    TextField(
+        durationMinutesText.value,
+        singleLine = true,
+        shape = RoundedCornerShape(25),
+        onValueChange = { durationMinutesText.value = it },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+    )
+    Text("Instructions: ", style = MaterialTheme.typography.h5)
+    TextField(
+        instructionsText.value,
+        singleLine = true,
+        shape = RoundedCornerShape(25),
+        onValueChange = { instructionsText.value = it }
+    )
+    Text(text = "Outputs:", style = MaterialTheme.typography.h5)
     recipeOutputPrototypes.forEachIndexed { index, recipeOutputPrototype ->
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = { recipeOutputPrototypes.remove(recipeOutputPrototype) }) {
-                Icon(
-                    modifier = Modifier.size(50.dp),
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = Color.Black
-                )
+        DeleteButton {
+            recipeInputPrototypes.removeAt(index)
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            EditRecipeInputPrototype(recipeOutputPrototype) {
+                recipeOutputPrototypes[index] = it
             }
-            Text(recipeOutputPrototype.ingredient.name)
-        }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                recipeOutputPrototype.amountText,
-                onValueChange = {
-                    val newPrototype = RecipeOutputPrototype(
-                        recipeOutputPrototype.ingredient,
-                        it,
-                        recipeOutputPrototype.scalable
-                    )
-                    recipeOutputPrototypes[index] = newPrototype
-                })
-            Text(recipeOutputPrototype.ingredient.measureUnit.name)
-        }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text("Scalable: ")
-            Checkbox(
-                checked = recipeOutputPrototype.scalable,
-                onCheckedChange = {
-                    val newPrototype = RecipeOutputPrototype(
-                        recipeOutputPrototype.ingredient,
-                        recipeOutputPrototype.amountText,
-                        it
-                    )
-                    recipeOutputPrototypes[index] = newPrototype
-                }
-            )
         }
     }
-    Button(onClick = onOutputAdd) {
-        Text("Add output")
-    }
-}
-
-data class RecipeInputPrototype(
-    val ingredient: Ingredient,
-    val amountText: String = "",
-    val scalable: Boolean = false
-) {
-
-    fun toRecipeInput(): RecipeInput? {
-        return RecipeInput(
-            ingredient,
-            amountText.toDoubleOrNull() ?: return null,
-            scalable
-        )
-    }
-}
-
-data class RecipeOutputPrototype(
-    val ingredient: Ingredient,
-    val amountText: String = "",
-    val scalable: Boolean = false
-) {
-
-    fun toRecipeOutput(): RecipeOutput? {
-        return RecipeOutput(
-            ingredient,
-            amountText.toDoubleOrNull() ?: return null,
-            scalable
-        )
-    }
-}
-
-@Composable
-internal fun DynamicSaveButton(
-    name: String,
-    recipeInputs: Set<RecipeInput>,
-    recipeOutputs: Set<RecipeOutput>,
-    durationMinutes: Int?,
-    instructionsText: String,
-    onCreation: (Recipe) -> Unit
-) {
-    if (durationMinutes != null && name.isNotBlank() && recipeInputs.isNotEmpty() && recipeOutputs.isNotEmpty() && instructionsText.isNotBlank()) {
-        Button(onClick = {
-            val recipe = Recipe(
-                name,
-                recipeInputs,
-                recipeOutputs,
-                Instruction(durationMinutes, instructionsText)
-            )
-            onCreation(recipe)
-        }) {
-            Text("Save")
+    Button(shape = RoundedCornerShape(50), onClick = onOutputAdd) {
+        Row {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            Text("Add output", style = MaterialTheme.typography.h6)
         }
     }
 }
@@ -239,101 +192,61 @@ internal fun CreateRecipe(
     val state = remember { mutableStateOf(RecipeCreationState.FILLING_FORM) }
     val recipeName = remember { mutableStateOf("") }
     val recipeInputPrototypes = remember { mutableStateListOf<RecipeInputPrototype>() }
-    val recipeOutputPrototypes = remember { mutableStateListOf<RecipeOutputPrototype>() }
+    val recipeOutputPrototypes = remember { mutableStateListOf<RecipeInputPrototype>() }
     val durationMinutesText = remember { mutableStateOf("") }
     val instructionsText = remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         when (state.value) {
             RecipeCreationState.FILLING_FORM -> {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Button(onClick = onCancel) {
-                        Text("Back")
-                    }
+                    BackButton(onClick = onCancel)
                     CreateRecipeForm(
                         recipeName,
                         recipeInputPrototypes,
                         recipeOutputPrototypes,
                         durationMinutesText,
                         instructionsText,
-                        onInputAdd = { state.value = RecipeCreationState.INPUT_INGREDIENT_SEARCH },
-                        onOutputAdd = { state.value = RecipeCreationState.OUTPUT_INGREDIENT_SEARCH }
+                        onInputAdd = { state.value = RecipeCreationState.REQUEST_INPUT_INGREDIENT },
+                        onOutputAdd = { state.value = RecipeCreationState.REQUEST_OUTPUT_INGREDIENT }
                     )
-                    DynamicSaveButton(
-                        recipeName.value,
-                        recipeInputPrototypes.mapNotNull { it.toRecipeInput() }.toSet(),
-                        recipeOutputPrototypes.mapNotNull { it.toRecipeOutput() }.toSet(),
-                        durationMinutesText.value.toIntOrNull(),
-                        instructionsText.value,
-                        onCreation
-                    )
+                    val durationMinutes = durationMinutesText.value.toIntOrNull()
+                    val recipeInputs = recipeInputPrototypes.mapNotNull { it.toRecipeInput() }.toSet()
+                    val recipeOutputs = recipeOutputPrototypes.mapNotNull { it.toRecipeOutput() }.toSet()
+                    val readyToSave =
+                        durationMinutes != null && recipeName.value.isNotBlank() && recipeInputs.isNotEmpty() && recipeOutputs.isNotEmpty() && instructionsText.value.isNotBlank()
+                    SaveButton(readyToSave) {
+                        val recipe = Recipe(
+                            recipeName.value,
+                            recipeInputs,
+                            recipeOutputs,
+                            Instruction(durationMinutes!!, instructionsText.value)
+                        )
+                        onCreation(recipe)
+                    }
                 }
             }
 
-            RecipeCreationState.INPUT_INGREDIENT_SEARCH -> {
-                Button(onClick = { state.value = RecipeCreationState.FILLING_FORM }) {
-                    Text("Back")
-                }
-                Button(onClick = {
-                    state.value = RecipeCreationState.INPUT_INGREDIENT_CREATION
-                }) {
-                    Text("Create ingredient")
-                }
-                val searchResults = remember { mutableStateListOf<SearchResult>() }
-                SearchField(SearchType.Ingredients) {
-                    searchResults.clear()
-                    searchResults.addAll(searchForIngredient(it))
-                }
-                SearchResultsList(searchResults) {
-                    require(it is IngredientSearchResult)
-                    recipeInputPrototypes.add(RecipeInputPrototype(it.ingredient))
-                    state.value = RecipeCreationState.FILLING_FORM
-                }
-            }
-
-            RecipeCreationState.INPUT_INGREDIENT_CREATION -> {
-                Button(onClick = { state.value = RecipeCreationState.FILLING_FORM }) {
-                    Text("Back")
-                }
-                CreateIngredient {
+            RecipeCreationState.REQUEST_INPUT_INGREDIENT -> SearchOrCreateIngredient(
+                searchForIngredient,
+                onCancel = { state.value = RecipeCreationState.FILLING_FORM },
+                onFinish = {
                     recipeInputPrototypes.add(RecipeInputPrototype(it))
                     state.value = RecipeCreationState.FILLING_FORM
-                }
-            }
+                },
+            )
 
-            RecipeCreationState.OUTPUT_INGREDIENT_SEARCH -> {
-                Button(onClick = { state.value = RecipeCreationState.FILLING_FORM }) {
-                    Text("Back")
-                }
-                Button(onClick = {
-                    state.value = RecipeCreationState.OUTPUT_INGREDIENT_CREATION
-                }) {
-                    Text("Create ingredient")
-                }
-                val searchResults = remember { mutableStateListOf<SearchResult>() }
-                SearchField(SearchType.Ingredients) {
-                    searchResults.clear()
-                    searchResults.addAll(searchForIngredient(it))
-                }
-                SearchResultsList(searchResults) {
-                    require(it is IngredientSearchResult)
-                    recipeOutputPrototypes.add(RecipeOutputPrototype(it.ingredient))
+            RecipeCreationState.REQUEST_OUTPUT_INGREDIENT -> SearchOrCreateIngredient(
+                searchForIngredient,
+                onCancel = { state.value = RecipeCreationState.FILLING_FORM },
+                onFinish = {
+                    recipeOutputPrototypes.add(RecipeInputPrototype(it))
                     state.value = RecipeCreationState.FILLING_FORM
-                }
-            }
-
-            RecipeCreationState.OUTPUT_INGREDIENT_CREATION -> {
-                Button(onClick = { state.value = RecipeCreationState.FILLING_FORM }) {
-                    Text("Back")
-                }
-                CreateIngredient {
-                    recipeOutputPrototypes.add(RecipeOutputPrototype(it))
-                    state.value = RecipeCreationState.FILLING_FORM
-                }
-            }
+                },
+            )
         }
     }
 }

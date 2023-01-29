@@ -3,6 +3,7 @@ package creation
 import BackButton
 import RESOURCE_ICON
 import SaveButton
+import SearchOrCreateIngredient
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,23 +13,21 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
-import logic.IngredientSearchResult
 import logic.SearchRequest
 import logic.SearchResult
-import logic.SearchType
-import search.SearchField
-import search.SearchResultsList
 
 enum class ResourceCreationState {
     FILLING_FORM,
-    INGREDIENT_SEARCH,
-    INGREDIENT_CREATION
+    REQUEST_INGREDIENT
 }
 
 @Composable
@@ -106,51 +105,28 @@ internal fun CreateResource(
     val state = remember { mutableStateOf(ResourceCreationState.FILLING_FORM) }
     val amountText = remember { mutableStateOf("") }
     val chosenIngredient = remember { mutableStateOf<Ingredient?>(null) }
-
-    val searchResults = remember { mutableStateListOf<SearchResult>() }
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         when (state.value) {
             ResourceCreationState.FILLING_FORM -> {
                 BackButton(onCancel)
                 CreateResourceForm(chosenIngredient.value, amountText) {
-                    state.value = ResourceCreationState.INGREDIENT_SEARCH
+                    state.value = ResourceCreationState.REQUEST_INGREDIENT
                 }
                 val amount = amountText.value.toDoubleOrNull()
-                val readyToSave = amount != null && chosenIngredient.value != null
+                val readyToSave = amount != null && amount > 0 && chosenIngredient.value != null
                 SaveButton(readyToSave) {
                     onCreation(chosenIngredient.value!!, amount!!)
                 }
             }
 
-            ResourceCreationState.INGREDIENT_SEARCH -> {
-                BackButton { state.value = ResourceCreationState.FILLING_FORM }
-                Button(
-                    shape = RoundedCornerShape(50),
-                    onClick = {
-                        state.value = ResourceCreationState.INGREDIENT_CREATION
-                    }) {
-                    Text("Create new ingredient", style = MaterialTheme.typography.h6)
-                }
-                Text("Or search for existing ingredient: ")
-                SearchField(SearchType.Ingredients) {
-                    searchResults.clear()
-                    searchResults.addAll(searchForIngredient(it))
-                }
-                SearchResultsList(searchResults) {
-                    require(it is IngredientSearchResult)
-                    chosenIngredient.value = it.ingredient
-                    state.value = ResourceCreationState.FILLING_FORM
-                    searchResults.clear()
-                }
-            }
-
-            ResourceCreationState.INGREDIENT_CREATION -> {
-                BackButton { state.value = ResourceCreationState.FILLING_FORM }
-                CreateIngredient {
+            ResourceCreationState.REQUEST_INGREDIENT -> SearchOrCreateIngredient(
+                searchForIngredient,
+                onCancel = { state.value = ResourceCreationState.FILLING_FORM },
+                onFinish = {
                     chosenIngredient.value = it
                     state.value = ResourceCreationState.FILLING_FORM
                 }
-            }
+            )
         }
     }
 }
