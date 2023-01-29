@@ -2,6 +2,7 @@ package creation
 
 import BackButton
 import RESOURCE_ICON
+import SaveButton
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -97,21 +98,6 @@ internal fun CreateResourceForm(
 }
 
 @Composable
-internal fun DynamicSaveButton(amount: Double?, ingredient: Ingredient?, onCreation: (Ingredient, Double) -> Unit) {
-    val allOk = amount != null && ingredient != null
-    Button(
-        shape = RoundedCornerShape(50),
-        onClick = {
-            if (allOk) {
-                onCreation(ingredient!!, amount!!)
-            }
-        }, enabled = allOk
-    ) {
-        Text("Save", style = MaterialTheme.typography.h6)
-    }
-}
-
-@Composable
 internal fun CreateResource(
     searchForIngredient: (SearchRequest) -> List<SearchResult>,
     onCancel: () -> Unit,
@@ -129,7 +115,11 @@ internal fun CreateResource(
                 CreateResourceForm(chosenIngredient.value, amountText) {
                     state.value = ResourceCreationState.INGREDIENT_SEARCH
                 }
-                DynamicSaveButton(amountText.value.toDoubleOrNull(), chosenIngredient.value, onCreation)
+                val amount = amountText.value.toDoubleOrNull()
+                val readyToSave = amount != null && chosenIngredient.value != null
+                SaveButton(readyToSave) {
+                    onCreation(chosenIngredient.value!!, amount!!)
+                }
             }
 
             ResourceCreationState.INGREDIENT_SEARCH -> {

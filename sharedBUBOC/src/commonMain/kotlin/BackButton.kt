@@ -23,3 +23,13 @@ internal fun BackButton(onClick: () -> Unit) {
         }
     }
 }
+
+@Composable
+internal fun SaveButton(enables: Boolean, onClick: () -> Unit) {
+    Button(
+        shape = RoundedCornerShape(50),
+        onClick = onClick, enabled = enables
+    ) {
+        Text("Save", style = MaterialTheme.typography.h6)
+    }
+}
