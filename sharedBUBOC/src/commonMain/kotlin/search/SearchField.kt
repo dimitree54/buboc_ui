@@ -3,9 +3,11 @@ package search
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import logic.SearchType
 internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit) {
     val inputText = remember { mutableStateOf("") }
     TextField(
+        shape = RoundedCornerShape(50),
         modifier = Modifier.fillMaxWidth().padding(10.dp),
         value = inputText.value,
         placeholder = {
@@ -39,9 +42,17 @@ internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit
         trailingIcon = {
             Icon(
                 modifier = Modifier.clickable {
-                    val searchRequest = SearchRequest(inputText.value, searchType)
-                    search(searchRequest)
+                    if (inputText.value.isNotBlank()) {
+                        search(SearchRequest(inputText.value, searchType))
+                    }
                 }, imageVector = Icons.Default.Search, contentDescription = null
             )
-        })
+        },
+        singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+            unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+            disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+        )
+    )
 }
