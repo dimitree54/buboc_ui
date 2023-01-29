@@ -2,8 +2,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -114,10 +117,19 @@ internal fun Main(database: FakeDatabase) {
             }
 
             BubocState.VIEW -> {
-                Button(onClick = {
-                    state.value = BubocState.SEARCH
-                }) {
-                    Text("Back")
+                Button(
+                    modifier = Modifier.padding(8.dp),
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        state.value = BubocState.SEARCH
+                    }) {
+                    Row {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null,
+                        )
+                        Text("Back", style = MaterialTheme.typography.h6)
+                    }
                 }
                 when (val item = viewItem.value) {
                     is ResourceSearchResult -> ViewResource(item.resource)

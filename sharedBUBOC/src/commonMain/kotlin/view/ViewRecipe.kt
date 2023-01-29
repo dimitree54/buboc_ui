@@ -1,10 +1,7 @@
 package view
 
 import RECIPE_ICON
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -22,7 +19,8 @@ import preview.PreviewRecipeOutputCard
 @Composable
 internal fun ViewRecipe(recipe: Recipe) {
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row {
             Icon(
@@ -32,21 +30,21 @@ internal fun ViewRecipe(recipe: Recipe) {
                 tint = Color.Black
             )
             Text(
-                text = "Recipe", style = MaterialTheme.typography.h4
+                text = recipe.name, style = MaterialTheme.typography.h3
             )
         }
-        Text(
-            text = recipe.name, style = MaterialTheme.typography.h5
-        )
-        Text(text = "Inputs:")
+        Text(text = "Inputs:", style = MaterialTheme.typography.h5)
         recipe.inputs.forEach {
             PreviewRecipeInputCard(it)
         }
-        Text(text = "Instructions:")
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Instructions:", style = MaterialTheme.typography.h5)
         Text(text = recipe.instruction.text)
-        Text(text = "Duration:")
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Duration:", style = MaterialTheme.typography.h5)
         Text(text = recipe.instruction.durationMinutes.toString() + " minutes")
-        Text(text = "Outputs:")
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Outputs:", style = MaterialTheme.typography.h5)
         recipe.outputs.forEach {
             PreviewRecipeOutputCard(it)
         }

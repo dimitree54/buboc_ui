@@ -1,10 +1,7 @@
 package view
 
 import RESOURCE_ICON
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -21,7 +18,8 @@ import preview.PreviewIngredientCard
 @Composable
 internal fun ViewResource(resource: Resource) {
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row {
             Icon(
