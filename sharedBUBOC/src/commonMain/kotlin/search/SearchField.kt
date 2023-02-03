@@ -12,13 +12,17 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import logic.SearchRequest
-import logic.SearchType
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import cuboc_core.cuboc.database.search.SearchRequest
+import cuboc_core.cuboc.database.search.SearchType
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit) {
     val inputText = remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         shape = RoundedCornerShape(50),
         modifier = Modifier.fillMaxWidth(),
@@ -42,6 +46,7 @@ internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit
                 Icon(
                     modifier = Modifier.clickable {
                         if (inputText.value.isNotBlank()) {
+                            keyboardController?.hide()
                             search(SearchRequest(inputText.value, searchType))
                         }
                     }, imageVector = Icons.Default.Search, contentDescription = null
