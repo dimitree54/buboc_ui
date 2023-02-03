@@ -10,7 +10,7 @@ version = "1.0-SNAPSHOT"
 kotlin {
     android()
 
-    jvm("desktop")
+    //jvm("desktop")
 
     ios()
     iosSimulatorArm64()
@@ -53,11 +53,11 @@ kotlin {
             dependsOn(iosMain)
         }
 
-        val desktopMain by getting {
-            dependencies {
-                implementation(compose.desktop.common)
-            }
-        }
+        // val desktopMain by getting {
+        //     dependencies {
+        //         implementation(compose.desktop.common)
+        //     }
+        // }
     }
 }
 

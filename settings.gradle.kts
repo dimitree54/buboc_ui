@@ -10,7 +10,7 @@ pluginManagement {
         val agpVersion = extra["agp.version"] as String
         val composeVersion = extra["compose.version"] as String
 
-        kotlin("jvm").version(kotlinVersion)
+        //kotlin("jvm").version(kotlinVersion)
         kotlin("multiplatform").version(kotlinVersion)
         kotlin("android").version(kotlinVersion)
         id("com.android.base").version(agpVersion)
@@ -25,5 +25,5 @@ rootProject.name = "buboc_ui"
 include(":cuboc_core")
 include(":sharedBUBOC")
 include(":androidBUBOC")
-include(":desktopBUBOC")
+//include(":desktopBUBOC")
 include(":jsBUBOC")
