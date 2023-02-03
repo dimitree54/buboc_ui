@@ -1,14 +1,14 @@
 package logic
 
-import cuboc.ingredient.Ingredient
-import cuboc.ingredient.RecipeInput
-import cuboc.ingredient.RecipeOutput
-import cuboc.ingredient.Resource
+import cuboc.database.CUBOCDatabase
+import cuboc.ingredient.*
 import cuboc.recipe.Instruction
 import cuboc.recipe.Recipe
+import cuboc.recipe.Scenario
+import cuboc_core.cuboc.database.search.*
 import utility.MeasureUnit
 
-class FakeDatabase {
+class FakeDatabase : CUBOCDatabase {
     private val potato = Resource("", Ingredient("Potato", MeasureUnit("kg")), 5.0)
     private val oil = Resource("", Ingredient("Oil", MeasureUnit("l")), 3.0)
     private val kitchen = Resource("", Ingredient("Kitchen", MeasureUnit("unit")), 1.0)
@@ -23,31 +23,32 @@ class FakeDatabase {
     private val resources = mutableListOf(potato, oil, kitchen, pan, chief, friedPotato)
     private val recipes = mutableListOf(recipe)
 
-    fun searchRecipeByName(name: String): List<Recipe> {
+    private fun searchRecipeByName(): List<Recipe> {
         return recipes
     }
 
-    fun searchResourceByName(name: String): List<Resource> {
+    private fun searchResourceByName(): List<Resource> {
         return resources
     }
 
-    fun searchIngredientByName(name: String): List<Ingredient> {
-        val ingredientsOfResources = searchResourceByName(name).map { it.ingredient }.toSet()
-        val ingredientsOfInputs = searchRecipeByInput(name).flatMap { it.inputs }.map { it.ingredient }.toSet()
-        val ingredientsOfOutputs = searchRecipeByOutput(name).flatMap { it.outputs }.map { it.ingredient }.toSet()
+    private fun searchIngredientByName(): List<Ingredient> {
+        val ingredientsOfResources = searchResourceByName().map { it.ingredient }.toSet()
+        val ingredientsOfInputs = searchRecipeByInput().flatMap { it.inputs }.map { it.ingredient }.toSet()
+        val ingredientsOfOutputs = searchRecipeByOutput().flatMap { it.outputs }.map { it.ingredient }.toSet()
         return (ingredientsOfResources + ingredientsOfInputs + ingredientsOfOutputs).toList()
     }
 
-    fun searchRecipeByInput(name: String): List<Recipe> {
+    private fun searchRecipeByInput(): List<Recipe> {
         return recipes
     }
 
-    fun searchRecipeByOutput(name: String): List<Recipe> {
+    private fun searchRecipeByOutput(): List<Recipe> {
         return recipes
     }
 
-    fun addRecipe(recipe: Recipe) {
+    override suspend fun addRecipe(recipe: Recipe): Boolean {
         recipes.add(recipe)
+        return true
     }
 
     private var lastId = 0
@@ -55,30 +56,36 @@ class FakeDatabase {
         return lastId++.toString()
     }
 
-    fun addResource(ingredient: Ingredient, amount: Double) {
+    override suspend fun addResource(ingredient: Ingredient, amount: Double): Resource {
         val resource = Resource(generateResourceId(), ingredient, amount)
         resources.add(resource)
+        return resource
     }
 
-    fun search(request: SearchRequest): List<SearchResult> {
-        val query = request.query ?: return emptyList()
-        when (request.type) {
+    override suspend fun search(request: SearchRequest): List<SearchResult> {
+        return when (request.type) {
             SearchType.All -> {
-                val resources = searchResourceByName(query).map { ResourceSearchResult(it) }
-                val recipes = searchRecipeByName(query).map { RecipeSearchResult(it) }
-                return resources + recipes
+                val resources = searchResourceByName().map { ResourceSearchResult(it) }
+                val recipes = searchRecipeByName().map { RecipeSearchResult(it) }
+                resources + recipes
             }
 
-            SearchType.Ingredients -> return searchIngredientByName(query).map { IngredientSearchResult(it) }
+            SearchType.Ingredients -> searchIngredientByName().map { IngredientSearchResult(it) }
             else -> TODO()
         }
     }
 
-    fun removeResource(resource: Resource) {
+    override suspend fun removeResource(resource: Resource): Boolean {
         resources.remove(resource)
+        return true
     }
 
-    fun removeRecipe(recipe: Recipe) {
+    override suspend fun removeRecipe(recipe: Recipe): Boolean {
         recipes.remove(recipe)
+        return true
+    }
+
+    override suspend fun execute(scenario: Scenario): PieceOfResource? {
+        TODO("Not yet implemented")
     }
 }
