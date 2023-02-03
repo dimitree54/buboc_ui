@@ -4,15 +4,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import creation.CreateRecipe
 import creation.CreateResource
-import logic.*
+import cuboc.database.CUBOCDatabase
+import cuboc_core.cuboc.database.search.RecipeSearchResult
+import cuboc_core.cuboc.database.search.ResourceSearchResult
+import cuboc_core.cuboc.database.search.SearchResult
+import cuboc_core.cuboc.database.search.SearchType
+import kotlinx.coroutines.launch
+import logic.FakeDatabase
 import search.SearchField
 import search.SearchResultsList
 import view.ViewRecipe
@@ -58,12 +61,13 @@ internal fun ActionButtons(
 }
 
 @Composable
-internal fun Main(database: FakeDatabase) {
+internal fun Main(database: CUBOCDatabase) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
     val createState = remember { mutableStateOf<CreateState?>(null) }
     val searchResults = remember { mutableStateListOf<SearchResult>() }
     val searchResultsListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
@@ -81,7 +85,9 @@ internal fun Main(database: FakeDatabase) {
                 )
                 SearchField(SearchType.All) {
                     searchResults.clear()
-                    searchResults.addAll(database.search(it))
+                    coroutineScope.launch {
+                        searchResults.addAll(database.search(it))
+                    }
                 }
                 SearchResultsList(searchResults, searchResultsListState) {
                     viewItem.value = it
@@ -93,23 +99,25 @@ internal fun Main(database: FakeDatabase) {
                 when (createState.value) {
                     CreateState.Resource -> CreateResource(
                         searchForIngredient = database::search,
-                        onCancel = { state.value = BubocState.SEARCH },
-                        onCreation = { ingredient, amount ->
-                            searchResults.clear()
+                        onCancel = { state.value = BubocState.SEARCH }
+                    ) { ingredient, amount ->
+                        searchResults.clear()
+                        state.value = BubocState.SEARCH
+                        coroutineScope.launch {
                             database.addResource(ingredient, amount)
-                            state.value = BubocState.SEARCH
                         }
-                    )
+                    }
 
                     CreateState.Recipe -> CreateRecipe(
                         searchForIngredient = database::search,
-                        onCancel = { state.value = BubocState.SEARCH },
-                        onCreation = { recipe ->
-                            searchResults.clear()
+                        onCancel = { state.value = BubocState.SEARCH }
+                    ) { recipe ->
+                        searchResults.clear()
+                        state.value = BubocState.SEARCH
+                        coroutineScope.launch {
                             database.addRecipe(recipe)
-                            state.value = BubocState.SEARCH
                         }
-                    )
+                    }
 
                     else -> throw IllegalStateException("Unsupported by creator search result type")
                 }
@@ -120,14 +128,18 @@ internal fun Main(database: FakeDatabase) {
                 when (val item = viewItem.value) {
                     is ResourceSearchResult -> ViewResource(item.resource) {
                         searchResults.clear()
-                        database.removeResource(item.resource)
                         state.value = BubocState.SEARCH
+                        coroutineScope.launch {
+                            database.removeResource(item.resource)
+                        }
                     }
 
                     is RecipeSearchResult -> ViewRecipe(item.recipe) {
                         searchResults.clear()
-                        database.removeRecipe(item.recipe)
                         state.value = BubocState.SEARCH
+                        coroutineScope.launch {
+                            database.removeRecipe(item.recipe)
+                        }
                     }
 
                     else -> throw IllegalStateException("Unsupported by viewer search result type")

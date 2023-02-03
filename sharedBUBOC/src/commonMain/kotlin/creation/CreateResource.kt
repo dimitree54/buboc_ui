@@ -22,8 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
-import logic.SearchRequest
-import logic.SearchResult
+import cuboc_core.cuboc.database.search.SearchRequest
+import cuboc_core.cuboc.database.search.SearchResult
+import kotlin.reflect.KSuspendFunction1
 
 enum class ResourceCreationState {
     FILLING_FORM,
@@ -98,7 +99,7 @@ internal fun CreateResourceForm(
 
 @Composable
 internal fun CreateResource(
-    searchForIngredient: (SearchRequest) -> List<SearchResult>,
+    searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
     onCreation: (Ingredient, Double) -> Unit,
 ) {
@@ -121,12 +122,11 @@ internal fun CreateResource(
 
             ResourceCreationState.REQUEST_INGREDIENT -> SearchOrCreateIngredient(
                 searchForIngredient,
-                onCancel = { state.value = ResourceCreationState.FILLING_FORM },
-                onFinish = {
-                    chosenIngredient.value = it
-                    state.value = ResourceCreationState.FILLING_FORM
-                }
-            )
+                onCancel = { state.value = ResourceCreationState.FILLING_FORM }
+            ) {
+                chosenIngredient.value = it
+                state.value = ResourceCreationState.FILLING_FORM
+            }
         }
     }
 }

@@ -25,8 +25,9 @@ import cuboc.ingredient.RecipeInput
 import cuboc.ingredient.RecipeOutput
 import cuboc.recipe.Instruction
 import cuboc.recipe.Recipe
-import logic.SearchRequest
-import logic.SearchResult
+import cuboc_core.cuboc.database.search.SearchRequest
+import cuboc_core.cuboc.database.search.SearchResult
+import kotlin.reflect.KSuspendFunction1
 
 enum class RecipeCreationState {
     FILLING_FORM,
@@ -81,6 +82,7 @@ internal fun EditRecipeInputPrototype(
                     onChange(newPrototype)
                 },
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Row {
                 Text("Scalable:")
@@ -185,7 +187,7 @@ internal fun CreateRecipeForm(
 
 @Composable
 internal fun CreateRecipe(
-    searchForIngredient: (SearchRequest) -> List<SearchResult>,
+    searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
     onCreation: (Recipe) -> Unit
 ) {
@@ -233,20 +235,18 @@ internal fun CreateRecipe(
             RecipeCreationState.REQUEST_INPUT_INGREDIENT -> SearchOrCreateIngredient(
                 searchForIngredient,
                 onCancel = { state.value = RecipeCreationState.FILLING_FORM },
-                onFinish = {
-                    recipeInputPrototypes.add(RecipeInputPrototype(it))
-                    state.value = RecipeCreationState.FILLING_FORM
-                },
-            )
+            ) {
+                recipeInputPrototypes.add(RecipeInputPrototype(it))
+                state.value = RecipeCreationState.FILLING_FORM
+            }
 
             RecipeCreationState.REQUEST_OUTPUT_INGREDIENT -> SearchOrCreateIngredient(
                 searchForIngredient,
                 onCancel = { state.value = RecipeCreationState.FILLING_FORM },
-                onFinish = {
-                    recipeOutputPrototypes.add(RecipeInputPrototype(it))
-                    state.value = RecipeCreationState.FILLING_FORM
-                },
-            )
+            ) {
+                recipeOutputPrototypes.add(RecipeInputPrototype(it))
+                state.value = RecipeCreationState.FILLING_FORM
+            }
         }
     }
 }

@@ -12,8 +12,13 @@ import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import logic.*
-import preview.*
+import cuboc_core.cuboc.database.search.IngredientSearchResult
+import cuboc_core.cuboc.database.search.RecipeSearchResult
+import cuboc_core.cuboc.database.search.ResourceSearchResult
+import cuboc_core.cuboc.database.search.SearchResult
+import preview.PreviewIngredientCard
+import preview.PreviewRecipeCard
+import preview.PreviewResourceCard
 
 
 @Composable
@@ -36,9 +41,7 @@ internal fun SearchResultsList(
                 ) {
                     when (result) {
                         is IngredientSearchResult -> PreviewIngredientCard(result.ingredient)
-                        is RecipeInputSearchResult -> PreviewRecipeInputCard(result.recipeInput)
                         is RecipeSearchResult -> PreviewRecipeCard(result.recipe)
-                        is RecipeOutputSearchResult -> PreviewRecipeOutputCard(result.recipeOutput)
                         is ResourceSearchResult -> PreviewResourceCard(result.resource)
                     }
                 }

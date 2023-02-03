@@ -6,21 +6,20 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import creation.CreateIngredient
 import cuboc.ingredient.Ingredient
-import logic.IngredientSearchResult
-import logic.SearchRequest
-import logic.SearchResult
-import logic.SearchType
+import cuboc_core.cuboc.database.search.IngredientSearchResult
+import cuboc_core.cuboc.database.search.SearchRequest
+import cuboc_core.cuboc.database.search.SearchResult
+import cuboc_core.cuboc.database.search.SearchType
+import kotlinx.coroutines.launch
 import search.SearchField
 import search.SearchResultsList
+import kotlin.reflect.KSuspendFunction1
 
 @Composable
 internal fun BackButton(onClick: () -> Unit) {
@@ -55,11 +54,12 @@ enum class SearchOrCreateIngredientState {
 
 @Composable
 internal fun SearchOrCreateIngredient(
-    searchForIngredient: (SearchRequest) -> List<SearchResult>,
+    searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
     onFinish: (Ingredient) -> Unit,
 ) {
     val state = remember { mutableStateOf(SearchOrCreateIngredientState.Search) }
+    val coroutineScope = rememberCoroutineScope()
     Column {
         BackButton(onCancel)
         when (state.value) {
@@ -75,7 +75,9 @@ internal fun SearchOrCreateIngredient(
                 val searchResults = remember { mutableStateListOf<SearchResult>() }
                 SearchField(SearchType.Ingredients) {
                     searchResults.clear()
-                    searchResults.addAll(searchForIngredient(it))
+                    coroutineScope.launch {
+                        searchResults.addAll(searchForIngredient(it))
+                    }
                 }
                 SearchResultsList(searchResults) {
                     require(it is IngredientSearchResult)
