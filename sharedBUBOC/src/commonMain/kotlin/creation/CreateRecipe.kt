@@ -213,15 +213,20 @@ internal fun CreateRecipe(
                         durationMinutesText,
                         instructionsText,
                         onInputAdd = { state.value = RecipeCreationState.REQUEST_INPUT_INGREDIENT },
-                        onOutputAdd = { state.value = RecipeCreationState.REQUEST_OUTPUT_INGREDIENT }
+                        onOutputAdd = {
+                            state.value = RecipeCreationState.REQUEST_OUTPUT_INGREDIENT
+                        }
                     )
                     val durationMinutes = durationMinutesText.value.toIntOrNull()
-                    val recipeInputs = recipeInputPrototypes.mapNotNull { it.toRecipeInput() }.toSet()
-                    val recipeOutputs = recipeOutputPrototypes.mapNotNull { it.toRecipeOutput() }.toSet()
+                    val recipeInputs =
+                        recipeInputPrototypes.mapNotNull { it.toRecipeInput() }.toSet()
+                    val recipeOutputs =
+                        recipeOutputPrototypes.mapNotNull { it.toRecipeOutput() }.toSet()
                     val readyToSave =
                         durationMinutes != null && recipeName.value.isNotBlank() && recipeInputs.isNotEmpty() && recipeOutputs.isNotEmpty() && instructionsText.value.isNotBlank()
                     SaveButton(readyToSave) {
                         val recipe = Recipe(
+                            null,
                             recipeName.value,
                             recipeInputs,
                             recipeOutputs,

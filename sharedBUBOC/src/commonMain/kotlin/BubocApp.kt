@@ -10,12 +10,12 @@ import androidx.compose.ui.unit.dp
 import creation.CreateRecipe
 import creation.CreateResource
 import cuboc.database.CUBOCDatabase
+import cuboc_core.cuboc.database.firebase.CUBOCFirebase
 import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
 import cuboc_core.cuboc.database.search.SearchType
 import kotlinx.coroutines.launch
-import logic.FakeDatabase
 import search.SearchField
 import search.SearchResultsList
 import view.ViewRecipe
@@ -23,7 +23,7 @@ import view.ViewResource
 
 @Composable
 internal fun BubocApp() {
-    val database = FakeDatabase()
+    val database = CUBOCFirebase()
     MaterialTheme {
         Main(database)
     }
@@ -100,11 +100,11 @@ internal fun Main(database: CUBOCDatabase) {
                     CreateState.Resource -> CreateResource(
                         searchForIngredient = database::search,
                         onCancel = { state.value = BubocState.SEARCH }
-                    ) { ingredient, amount ->
+                    ) { newResource ->
                         searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
-                            database.addResource(ingredient, amount)
+                            database.addResource(newResource)
                         }
                     }
 
