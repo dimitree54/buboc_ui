@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
-import cuboc.ingredient.ResourcePrototype
+import cuboc.ingredient.Resource
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
 import kotlin.reflect.KSuspendFunction1
@@ -102,7 +102,7 @@ internal fun CreateResourceForm(
 internal fun CreateResource(
     searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
-    onCreation: (ResourcePrototype) -> Unit,
+    onCreation: (Resource) -> Unit,
 ) {
     val state = remember { mutableStateOf(ResourceCreationState.FILLING_FORM) }
     val amountText = remember { mutableStateOf("") }
@@ -117,7 +117,7 @@ internal fun CreateResource(
                 val amount = amountText.value.toDoubleOrNull()
                 val readyToSave = amount != null && amount > 0 && chosenIngredient.value != null
                 SaveButton(readyToSave) {
-                    val newResource = ResourcePrototype(chosenIngredient.value!!, amount!!)
+                    val newResource = Resource(chosenIngredient.value!!, amount!!)
                     onCreation(newResource)
                 }
             }

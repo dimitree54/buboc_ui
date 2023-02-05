@@ -24,7 +24,7 @@ import cuboc.ingredient.Ingredient
 import cuboc.ingredient.RecipeInput
 import cuboc.ingredient.RecipeOutput
 import cuboc.recipe.Instruction
-import cuboc.recipe.RecipePrototype
+import cuboc.recipe.Recipe
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
 import kotlin.reflect.KSuspendFunction1
@@ -189,7 +189,7 @@ internal fun CreateRecipeForm(
 internal fun CreateRecipe(
     searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
-    onCreation: (RecipePrototype) -> Unit
+    onCreation: (Recipe) -> Unit
 ) {
     val state = remember { mutableStateOf(RecipeCreationState.FILLING_FORM) }
     val recipeName = remember { mutableStateOf("") }
@@ -225,7 +225,7 @@ internal fun CreateRecipe(
                     val readyToSave =
                         durationMinutes != null && recipeName.value.isNotBlank() && recipeInputs.isNotEmpty() && recipeOutputs.isNotEmpty() && instructionsText.value.isNotBlank()
                     SaveButton(readyToSave) {
-                        val recipe = RecipePrototype(
+                        val recipe = Recipe(
                             recipeName.value,
                             recipeInputs,
                             recipeOutputs,
