@@ -6,3 +6,4 @@ val RECIPE_OUTPUT_ICON = Icons.Default.KeyboardArrowUp
 val RESOURCE_ICON = Icons.Default.ShoppingCart
 val RECIPE_INPUT_ICON = Icons.Default.KeyboardArrowDown
 val RECIPE_ICON = Icons.Default.List
+val REQUEST_ICON = Icons.Default.Build

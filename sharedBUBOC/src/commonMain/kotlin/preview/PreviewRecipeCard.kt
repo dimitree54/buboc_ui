@@ -2,10 +2,10 @@ package preview
 
 import RECIPE_ICON
 import androidx.compose.runtime.Composable
-import cuboc_core.cuboc.database.UserRecipe
+import cuboc.recipe.Recipe
 
 
 @Composable
-internal fun PreviewRecipeCard(recipe: UserRecipe) {
+internal fun PreviewRecipeCard(recipe: Recipe) {
     PreviewCard(recipe.name, "duration: " + recipe.instruction.durationMinutes + " minutes", RECIPE_ICON)
 }

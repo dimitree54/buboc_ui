@@ -1,0 +1,15 @@
+package preview
+
+import RECIPE_INPUT_ICON
+import androidx.compose.runtime.Composable
+import cuboc.ingredient.PieceOfResource
+
+
+@Composable
+internal fun PreviewPieceOfResource(pieceOfResource: PieceOfResource) {
+    PreviewCard(
+        pieceOfResource.resource.ingredient.name,
+        pieceOfResource.amount.toString() + " " + pieceOfResource.resource.ingredient.measureUnit.name,
+        RECIPE_INPUT_ICON
+    )
+}

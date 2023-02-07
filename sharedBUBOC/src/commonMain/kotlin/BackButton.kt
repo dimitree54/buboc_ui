@@ -54,6 +54,7 @@ enum class SearchOrCreateIngredientState {
 
 @Composable
 internal fun SearchOrCreateIngredient(
+    allowCreation: Boolean,
     searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
     onFinish: (Ingredient) -> Unit,
@@ -64,12 +65,14 @@ internal fun SearchOrCreateIngredient(
         BackButton(onCancel)
         when (state.value) {
             SearchOrCreateIngredientState.Search -> {
-                Button(
-                    shape = RoundedCornerShape(50),
-                    onClick = {
-                        state.value = SearchOrCreateIngredientState.Create
-                    }) {
-                    Text("Create new ingredient", style = MaterialTheme.typography.h6)
+                if (allowCreation) {
+                    Button(
+                        shape = RoundedCornerShape(50),
+                        onClick = {
+                            state.value = SearchOrCreateIngredientState.Create
+                        }) {
+                        Text("Create new ingredient", style = MaterialTheme.typography.h6)
+                    }
                 }
                 Text("Or search for existing ingredient: ")
                 val searchResults = remember { mutableStateListOf<SearchResult>() }

@@ -1,7 +1,7 @@
 package creation
 
 import BackButton
-import RESOURCE_ICON
+import REQUEST_ICON
 import SaveButton
 import SearchOrCreateIngredient
 import androidx.compose.foundation.layout.*
@@ -22,18 +22,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
-import cuboc.ingredient.Resource
+import cuboc.ingredient.IngredientRequest
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
 import kotlin.reflect.KSuspendFunction1
 
-enum class ResourceCreationState {
+enum class RequestCreationState {
     FILLING_FORM,
     REQUEST_INGREDIENT
 }
 
 @Composable
-internal fun CreateResourceForm(
+internal fun CreateRequestForm(
     ingredient: Ingredient?,
     amountText: MutableState<String>,
     onIngredientSearch: () -> Unit,
@@ -45,12 +45,12 @@ internal fun CreateResourceForm(
         Row {
             Icon(
                 modifier = Modifier.size(50.dp),
-                imageVector = RESOURCE_ICON,
+                imageVector = REQUEST_ICON,
                 contentDescription = null,
                 tint = Color.Black
             )
             Text(
-                text = "Create resource", style = MaterialTheme.typography.h3
+                text = "Create request", style = MaterialTheme.typography.h3
             )
         }
         Text(
@@ -99,36 +99,36 @@ internal fun CreateResourceForm(
 }
 
 @Composable
-internal fun CreateResource(
+internal fun CreateRequest(
     searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
-    onCreation: (Resource) -> Unit,
+    onCreation: (IngredientRequest) -> Unit,
 ) {
-    val state = remember { mutableStateOf(ResourceCreationState.FILLING_FORM) }
+    val state = remember { mutableStateOf(RequestCreationState.FILLING_FORM) }
     val amountText = remember { mutableStateOf("") }
     val chosenIngredient = remember { mutableStateOf<Ingredient?>(null) }
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         when (state.value) {
-            ResourceCreationState.FILLING_FORM -> {
+            RequestCreationState.FILLING_FORM -> {
                 BackButton(onCancel)
-                CreateResourceForm(chosenIngredient.value, amountText) {
-                    state.value = ResourceCreationState.REQUEST_INGREDIENT
+                CreateRequestForm(chosenIngredient.value, amountText) {
+                    state.value = RequestCreationState.REQUEST_INGREDIENT
                 }
                 val amount = amountText.value.toDoubleOrNull()
                 val readyToSave = amount != null && amount > 0 && chosenIngredient.value != null
                 SaveButton(readyToSave) {
-                    val newResource = Resource(chosenIngredient.value!!, amount!!)
-                    onCreation(newResource)
+                    val request = IngredientRequest(chosenIngredient.value!!, amount!!)
+                    onCreation(request)
                 }
             }
 
-            ResourceCreationState.REQUEST_INGREDIENT -> SearchOrCreateIngredient(
-                true,
+            RequestCreationState.REQUEST_INGREDIENT -> SearchOrCreateIngredient(
+                false,
                 searchForIngredient,
-                onCancel = { state.value = ResourceCreationState.FILLING_FORM }
+                onCancel = { state.value = RequestCreationState.FILLING_FORM }
             ) {
                 chosenIngredient.value = it
-                state.value = ResourceCreationState.FILLING_FORM
+                state.value = RequestCreationState.FILLING_FORM
             }
         }
     }

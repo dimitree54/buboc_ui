@@ -2,14 +2,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import creation.CreateRecipe
+import creation.CreateRequest
 import creation.CreateResource
+import cuboc.ScenariosBuilder
 import cuboc.database.CUBOCDatabase
+import cuboc.recipe.Scenario
 import cuboc_core.cuboc.database.firebase.CUBOCFirebase
 import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
@@ -20,27 +25,30 @@ import search.SearchField
 import search.SearchResultsList
 import view.ViewRecipe
 import view.ViewResource
+import view.ViewScenario
 
 @Composable
 internal fun BubocApp() {
     val database = CUBOCFirebase()
+    val scenariosBuilder = ScenariosBuilder(database, 5)
     MaterialTheme {
-        Main(database)
+        Main(database, scenariosBuilder)
     }
 }
 
 enum class BubocState {
-    SEARCH, CREATE, VIEW
+    SEARCH, CREATE, VIEW, REQUEST, LOADING
 }
 
 enum class CreateState {
-    Resource, Recipe
+    Resource, Recipe, Request
 }
 
 @Composable
 internal fun ActionButtons(
     onCreateRecipe: () -> Unit,
-    onCreateResource: () -> Unit
+    onCreateResource: () -> Unit,
+    onRequest: () -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         Button(
@@ -48,22 +56,30 @@ internal fun ActionButtons(
             modifier = Modifier.weight(1f),
             onClick = onCreateRecipe
         ) {
-            Text("New recipe")
+            Text("+recipe")
         }
         Button(
             shape = RoundedCornerShape(50),
             modifier = Modifier.weight(1f),
             onClick = onCreateResource
         ) {
-            Text("New resource")
+            Text("+resource")
+        }
+        Button(
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.weight(1f),
+            onClick = onRequest
+        ) {
+            Text("+request")
         }
     }
 }
 
 @Composable
-internal fun Main(database: CUBOCDatabase) {
+internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
+    val scenario = remember { mutableStateOf<Scenario?>(null) }
     val createState = remember { mutableStateOf<CreateState?>(null) }
     val searchResults = remember { mutableStateListOf<SearchResult>() }
     val searchResultsListState = rememberLazyListState()
@@ -81,12 +97,18 @@ internal fun Main(database: CUBOCDatabase) {
                     onCreateResource = {
                         createState.value = CreateState.Resource
                         state.value = BubocState.CREATE
+                    },
+                    onRequest = {
+                        createState.value = CreateState.Request
+                        state.value = BubocState.CREATE
                     }
                 )
                 SearchField(SearchType.All) {
+                    state.value = BubocState.LOADING
                     searchResults.clear()
                     coroutineScope.launch {
                         searchResults.addAll(database.search(it))
+                        state.value = BubocState.SEARCH
                     }
                 }
                 SearchResultsList(searchResults, searchResultsListState) {
@@ -101,10 +123,11 @@ internal fun Main(database: CUBOCDatabase) {
                         searchForIngredient = database::search,
                         onCancel = { state.value = BubocState.SEARCH }
                     ) { newResource ->
+                        state.value = BubocState.LOADING
                         searchResults.clear()
-                        state.value = BubocState.SEARCH
                         coroutineScope.launch {
                             database.addResource(newResource)
+                            state.value = BubocState.SEARCH
                         }
                     }
 
@@ -112,19 +135,36 @@ internal fun Main(database: CUBOCDatabase) {
                         searchForIngredient = database::search,
                         onCancel = { state.value = BubocState.SEARCH }
                     ) { recipe ->
+                        state.value = BubocState.LOADING
                         searchResults.clear()
-                        state.value = BubocState.SEARCH
                         coroutineScope.launch {
                             database.addRecipe(recipe)
+                            state.value = BubocState.SEARCH
                         }
                     }
 
-                    else -> throw IllegalStateException("Unsupported by creator search result type")
+                    CreateState.Request -> CreateRequest(
+                        searchForIngredient = database::search,
+                        onCancel = { state.value = BubocState.SEARCH }
+                    ) { request ->
+                        coroutineScope.launch {
+                            scenario.value = scenariosBuilder.searchForBestScenario(request)
+                            state.value = BubocState.REQUEST
+                        }
+                    }
+
+                    else -> {
+                        println("Unsupported create state")
+                        state.value = BubocState.SEARCH
+                    }
                 }
             }
 
             BubocState.VIEW -> {
-                BackButton { state.value = BubocState.SEARCH }
+                BackButton {
+                    viewItem.value = null
+                    state.value = BubocState.SEARCH
+                }
                 when (val item = viewItem.value) {
                     is ResourceSearchResult -> ViewResource(item.resource) {
                         searchResults.clear()
@@ -144,6 +184,29 @@ internal fun Main(database: CUBOCDatabase) {
 
                     else -> throw IllegalStateException("Unsupported by viewer search result type")
                 }
+            }
+
+            BubocState.REQUEST -> {
+                BackButton {
+                    scenario.value = null
+                    state.value = BubocState.SEARCH
+                }
+                if (scenario.value == null) {
+                    Text("Request can not be produced")
+                } else {
+                    ViewScenario(scenario.value!!) {
+                        state.value = BubocState.SEARCH
+                        coroutineScope.launch {
+                            database.execute(scenario.value!!)
+                            scenario.value = null
+                            state.value = BubocState.SEARCH
+                        }
+                    }
+                }
+            }
+
+            BubocState.LOADING -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
         }
 

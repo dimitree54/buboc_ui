@@ -237,6 +237,7 @@ internal fun CreateRecipe(
             }
 
             RecipeCreationState.REQUEST_INPUT_INGREDIENT -> SearchOrCreateIngredient(
+                true,
                 searchForIngredient,
                 onCancel = { state.value = RecipeCreationState.FILLING_FORM },
             ) {
@@ -245,6 +246,7 @@ internal fun CreateRecipe(
             }
 
             RecipeCreationState.REQUEST_OUTPUT_INGREDIENT -> SearchOrCreateIngredient(
+                true,
                 searchForIngredient,
                 onCancel = { state.value = RecipeCreationState.FILLING_FORM },
             ) {
