@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -16,12 +17,15 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
 import utility.MeasureUnit
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreateIngredient(
     onCreation: (Ingredient) -> Unit
@@ -43,11 +47,19 @@ internal fun CreateIngredient(
             )
         }
         Text(text = "Name: ", style = MaterialTheme.typography.h5)
+        val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
             ingredientName.value,
             singleLine = true,
             shape = RoundedCornerShape(25),
-            onValueChange = { ingredientName.value = it }
+            onValueChange = {
+                if (it.lastOrNull() == '\n') {
+                    keyboardController?.hide()
+                } else {
+                    ingredientName.value = it
+                }
+            },
+            keyboardActions = KeyboardActions { keyboardController?.hide() }
         )
         Text(
             text = "Measure unit: ",
@@ -57,7 +69,14 @@ internal fun CreateIngredient(
             measureUnitName.value,
             singleLine = true,
             shape = RoundedCornerShape(25),
-            onValueChange = { measureUnitName.value = it }
+            onValueChange = {
+                if (it.lastOrNull() == '\n') {
+                    keyboardController?.hide()
+                } else {
+                    measureUnitName.value = it
+                }
+            },
+            keyboardActions = KeyboardActions { keyboardController?.hide() }
         )
 
         val readyToSave = ingredientName.value.isNotBlank() && measureUnitName.value.isNotBlank()

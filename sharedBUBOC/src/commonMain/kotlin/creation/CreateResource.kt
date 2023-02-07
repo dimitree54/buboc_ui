@@ -7,6 +7,7 @@ import SearchOrCreateIngredient
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -17,8 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
@@ -32,6 +35,7 @@ enum class ResourceCreationState {
     REQUEST_INGREDIENT
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreateResourceForm(
     ingredient: Ingredient?,
@@ -73,13 +77,21 @@ internal fun CreateResourceForm(
                 text = "Amount(in ${ingredient.measureUnit.name}): ",
                 style = MaterialTheme.typography.h5
             )
+            val keyboardController = LocalSoftwareKeyboardController.current
             TextField(
                 amountText.value,
                 modifier = Modifier.width(60.dp),
                 singleLine = true,
                 shape = RoundedCornerShape(25),
-                onValueChange = { amountText.value = it },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                onValueChange = {
+                    if (it.lastOrNull() == '\n') {
+                        keyboardController?.hide()
+                    } else if (it.toDoubleOrNull() != null) {
+                        amountText.value = it
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardActions = KeyboardActions { keyboardController?.hide() }
             )
         } else {
             Button(

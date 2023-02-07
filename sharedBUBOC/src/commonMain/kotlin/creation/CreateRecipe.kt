@@ -10,14 +10,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
@@ -62,6 +65,7 @@ data class RecipeInputPrototype(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun EditRecipeInputPrototype(
     recipeOutputPrototype: RecipeInputPrototype,
@@ -71,18 +75,24 @@ internal fun EditRecipeInputPrototype(
         Column(modifier = Modifier.padding(8.dp)) {
             Text(recipeOutputPrototype.ingredient.name, style = MaterialTheme.typography.h6)
             Text("Amount (in ${recipeOutputPrototype.ingredient.measureUnit.name}): ")
+            val keyboardController = LocalSoftwareKeyboardController.current
             TextField(
                 recipeOutputPrototype.amountText,
                 onValueChange = {
-                    val newPrototype = RecipeInputPrototype(
-                        recipeOutputPrototype.ingredient,
-                        it,
-                        recipeOutputPrototype.scalable
-                    )
-                    onChange(newPrototype)
+                    if (it.lastOrNull() == '\n') {
+                        keyboardController?.hide()
+                    } else if (it.toDoubleOrNull() != null || it.isEmpty()) {
+                        val newPrototype = RecipeInputPrototype(
+                            recipeOutputPrototype.ingredient,
+                            it,
+                            recipeOutputPrototype.scalable
+                        )
+                        onChange(newPrototype)
+                    }
                 },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardActions = KeyboardActions { keyboardController?.hide() }
             )
             Row {
                 Text("Scalable:")
@@ -103,6 +113,7 @@ internal fun EditRecipeInputPrototype(
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreateRecipeForm(
     recipeName: MutableState<String>,
@@ -128,11 +139,19 @@ internal fun CreateRecipeForm(
         text = "Name: ",
         style = MaterialTheme.typography.h5
     )
+    val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         recipeName.value,
         singleLine = true,
         shape = RoundedCornerShape(25),
-        onValueChange = { recipeName.value = it }
+        onValueChange = {
+            if (it.lastOrNull() == '\n') {
+                keyboardController?.hide()
+            } else {
+                recipeName.value = it
+            }
+        },
+        keyboardActions = KeyboardActions { keyboardController?.hide() }
     )
     Text(text = "Inputs:", style = MaterialTheme.typography.h5)
     recipeInputPrototypes.forEachIndexed { index, recipeInputPrototype ->
@@ -156,15 +175,29 @@ internal fun CreateRecipeForm(
         durationMinutesText.value,
         singleLine = true,
         shape = RoundedCornerShape(25),
-        onValueChange = { durationMinutesText.value = it },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        onValueChange = {
+            if (it.lastOrNull() == '\n') {
+                keyboardController?.hide()
+            } else if (it.toDoubleOrNull() != null) {
+                durationMinutesText.value = it
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        keyboardActions = KeyboardActions { keyboardController?.hide() }
     )
     Text("Instructions: ", style = MaterialTheme.typography.h5)
     TextField(
         instructionsText.value,
         singleLine = true,
         shape = RoundedCornerShape(25),
-        onValueChange = { instructionsText.value = it }
+        onValueChange = {
+            if (it.lastOrNull() == '\n') {
+                keyboardController?.hide()
+            } else {
+                instructionsText.value = it
+            }
+        },
+        keyboardActions = KeyboardActions { keyboardController?.hide() }
     )
     Text(text = "Outputs:", style = MaterialTheme.typography.h5)
     recipeOutputPrototypes.forEachIndexed { index, recipeOutputPrototype ->
