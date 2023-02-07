@@ -104,11 +104,9 @@ internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
                     }
                 )
                 SearchField(SearchType.All) {
-                    state.value = BubocState.LOADING
                     searchResults.clear()
                     coroutineScope.launch {
                         searchResults.addAll(database.search(it))
-                        state.value = BubocState.SEARCH
                     }
                 }
                 SearchResultsList(searchResults, searchResultsListState) {
