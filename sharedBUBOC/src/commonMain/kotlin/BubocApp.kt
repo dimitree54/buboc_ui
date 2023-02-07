@@ -198,7 +198,7 @@ internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
                         searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
-                            database.execute(scenario.value!!)
+                            database.execute(scenario.value!!, "test_user")
                             scenario.value = null
                             state.value = BubocState.SEARCH
                         }
