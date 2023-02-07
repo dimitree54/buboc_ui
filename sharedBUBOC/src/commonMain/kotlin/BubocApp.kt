@@ -195,6 +195,7 @@ internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
                     Text("Request can not be produced")
                 } else {
                     ViewScenario(scenario.value!!) {
+                        searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
                             database.execute(scenario.value!!)
