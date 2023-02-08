@@ -7,5 +7,5 @@ import cuboc.ingredient.Ingredient
 
 @Composable
 internal fun PreviewIngredientCard(ingredient: Ingredient) {
-    PreviewCard(ingredient.name, "measure unit: " + ingredient.measureUnit.name.name, INGREDIENT_ICON)
+    PreviewCard(ingredient.name, "measure unit: " + ingredient.measureUnit, INGREDIENT_ICON)
 }

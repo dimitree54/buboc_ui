@@ -43,7 +43,7 @@ internal fun ViewRecipe(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Instructions:", style = MaterialTheme.typography.h5)
-        Text(text = recipe.instruction.text.text)
+        Text(text = recipe.instruction.text.toString())
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Duration:", style = MaterialTheme.typography.h5)
         Text(text = recipe.instruction.durationMinutes.toString() + " minutes")
