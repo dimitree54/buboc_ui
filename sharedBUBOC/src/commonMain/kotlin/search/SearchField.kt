@@ -12,6 +12,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -24,8 +25,12 @@ import cuboc_core.cuboc.database.search.SearchType
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal fun SearchField(searchType: SearchType, search: (SearchRequest) -> Unit) {
-    val inputText = remember { mutableStateOf("") }
+internal fun SearchField(
+    searchType: SearchType,
+    initialQuery: MutableState<String>? = null,
+    search: (SearchRequest) -> Unit
+) {
+    val inputText = initialQuery ?: remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         shape = RoundedCornerShape(50),

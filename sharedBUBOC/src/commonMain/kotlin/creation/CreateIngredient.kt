@@ -28,9 +28,9 @@ import utility.MeasureUnit
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreateIngredient(
+    ingredientName: String,
     onCreation: (Ingredient) -> Unit
 ) {
-    val ingredientName = remember { mutableStateOf("") }
     val measureUnitName = remember { mutableStateOf("") }
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -49,16 +49,11 @@ internal fun CreateIngredient(
         Text(text = "Name: ", style = MaterialTheme.typography.h5)
         val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
-            ingredientName.value,
+            ingredientName,
             singleLine = true,
             shape = RoundedCornerShape(25),
-            onValueChange = {
-                if (it.lastOrNull() == '\n') {
-                    keyboardController?.hide()
-                } else {
-                    ingredientName.value = it
-                }
-            },
+            enabled = false,
+            onValueChange = {},
             keyboardActions = KeyboardActions { keyboardController?.hide() }
         )
         Text(
@@ -79,9 +74,9 @@ internal fun CreateIngredient(
             keyboardActions = KeyboardActions { keyboardController?.hide() }
         )
 
-        val readyToSave = ingredientName.value.isNotBlank() && measureUnitName.value.isNotBlank()
+        val readyToSave = ingredientName.isNotBlank() && measureUnitName.value.isNotBlank()
         SaveButton(readyToSave) {
-            onCreation(Ingredient(ingredientName.value, MeasureUnit(measureUnitName.value)))
+            onCreation(Ingredient(ingredientName, MeasureUnit(measureUnitName.value)))
         }
     }
 }

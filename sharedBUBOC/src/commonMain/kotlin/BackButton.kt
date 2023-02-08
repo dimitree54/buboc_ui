@@ -16,6 +16,8 @@ import cuboc_core.cuboc.database.search.IngredientSearchResult
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
 import cuboc_core.cuboc.database.search.SearchType
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import search.SearchField
 import search.SearchResultsList
@@ -61,35 +63,40 @@ internal fun SearchOrCreateIngredient(
 ) {
     val state = remember { mutableStateOf(SearchOrCreateIngredientState.Search) }
     val coroutineScope = rememberCoroutineScope()
+    val searchQuery = remember { mutableStateOf("") }
+    val searchResults = remember { mutableStateListOf<SearchResult>() }
     Column {
         BackButton(onCancel)
         when (state.value) {
             SearchOrCreateIngredientState.Search -> {
-                if (allowCreation) {
+                var searchingCoroutine: Job? by remember { mutableStateOf(null) }
+                SearchField(SearchType.Ingredients, searchQuery) {
+                    searchingCoroutine?.cancel()
+                    searchingCoroutine = coroutineScope.launch {
+                        delay(1000)
+                        val found = searchForIngredient(it)
+                        searchResults.clear()
+                        searchResults.addAll(found)
+                    }
+                }
+                if (allowCreation && searchQuery.value.isNotBlank() && searchResults.isEmpty()) {
                     Button(
                         shape = RoundedCornerShape(50),
                         onClick = {
                             state.value = SearchOrCreateIngredientState.Create
                         }) {
-                        Text("Create new ingredient", style = MaterialTheme.typography.h6)
+                        Text("Create ingredient \"${searchQuery.value}\"", style = MaterialTheme.typography.h6)
                     }
-                }
-                Text("Or search for existing ingredient: ")
-                val searchResults = remember { mutableStateListOf<SearchResult>() }
-                SearchField(SearchType.Ingredients) {
-                    searchResults.clear()
-                    coroutineScope.launch {
-                        searchResults.addAll(searchForIngredient(it))
+                } else {
+                    SearchResultsList(searchResults) {
+                        require(it is IngredientSearchResult)
+                        searchResults.clear()
+                        onFinish(it.ingredient)
                     }
-                }
-                SearchResultsList(searchResults) {
-                    require(it is IngredientSearchResult)
-                    searchResults.clear()
-                    onFinish(it.ingredient)
                 }
             }
 
-            SearchOrCreateIngredientState.Create -> CreateIngredient(onFinish)
+            SearchOrCreateIngredientState.Create -> CreateIngredient(searchQuery.value, onFinish)
         }
     }
 }

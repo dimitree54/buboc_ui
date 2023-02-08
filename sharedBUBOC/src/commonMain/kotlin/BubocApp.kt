@@ -20,6 +20,8 @@ import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
 import cuboc_core.cuboc.database.search.SearchType
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import search.SearchField
 import search.SearchResultsList
@@ -103,10 +105,14 @@ internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
                         state.value = BubocState.CREATE
                     }
                 )
+                var searchingCoroutine: Job? by remember { mutableStateOf(null) }
                 SearchField(SearchType.All) {
-                    searchResults.clear()
-                    coroutineScope.launch {
-                        searchResults.addAll(database.search(it))
+                    searchingCoroutine?.cancel()
+                    searchingCoroutine = coroutineScope.launch {
+                        delay(1000)
+                        val found = database.search(it)
+                        searchResults.clear()
+                        searchResults.addAll(found)
                     }
                 }
                 SearchResultsList(searchResults, searchResultsListState) {
