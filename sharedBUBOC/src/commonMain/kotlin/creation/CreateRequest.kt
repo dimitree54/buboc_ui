@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
-import cuboc.ingredient.IngredientRequest
+import cuboc.ingredient.Resource
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
 import kotlin.reflect.KSuspendFunction1
@@ -114,7 +114,7 @@ internal fun CreateRequestForm(
 internal fun CreateRequest(
     searchForIngredient: KSuspendFunction1<SearchRequest, List<SearchResult>>,
     onCancel: () -> Unit,
-    onCreation: (IngredientRequest) -> Unit,
+    onCreation: (Resource) -> Unit,
 ) {
     val state = remember { mutableStateOf(RequestCreationState.FILLING_FORM) }
     val amountText = remember { mutableStateOf("") }
@@ -129,7 +129,7 @@ internal fun CreateRequest(
                 val amount = amountText.value.toDoubleOrNull()
                 val readyToSave = amount != null && amount > 0 && chosenIngredient.value != null
                 SaveButton(readyToSave) {
-                    val request = IngredientRequest(chosenIngredient.value!!, amount!!)
+                    val request = Resource(chosenIngredient.value!!, amount!!)
                     onCreation(request)
                 }
             }
