@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cuboc_core.cuboc.database.UserRecipe
+import cuboc_core.cuboc.recipe.UserRecipe
 import preview.PreviewRecipeInputCard
 import preview.PreviewRecipeOutputCard
 
