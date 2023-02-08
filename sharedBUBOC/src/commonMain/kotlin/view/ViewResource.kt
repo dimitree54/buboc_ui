@@ -33,13 +33,13 @@ internal fun ViewResource(
                 tint = Color.Black
             )
             Text(
-                text = resource.ingredient.name.toString(), style = MaterialTheme.typography.h3
+                text = resource.resource.ingredient.name.toString(), style = MaterialTheme.typography.h3
             )
         }
         Text("Ingredient: ", style = MaterialTheme.typography.h5)
-        PreviewIngredientCard(resource.ingredient)
+        PreviewIngredientCard(resource.resource.ingredient)
         Text("Amount:", style = MaterialTheme.typography.h5)
-        Text(resource.amount.toString() + " " + resource.ingredient.measureUnit)
+        Text(resource.resource.amount.toString() + " " + resource.resource.ingredient.measureUnit)
         DeleteButton(false, onDelete)
     }
 }

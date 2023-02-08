@@ -8,8 +8,8 @@ import cuboc_core.cuboc.ingredient.UserResource
 @Composable
 internal fun PreviewResourceCard(resource: UserResource) {
     PreviewCard(
-        resource.ingredient.name.toString(),
-        resource.amount.toString() + " " + resource.ingredient.measureUnit,
+        resource.resource.ingredient.name.toString(),
+        resource.resource.amount.toString() + " " + resource.resource.ingredient.measureUnit,
         RESOURCE_ICON
     )
 }
