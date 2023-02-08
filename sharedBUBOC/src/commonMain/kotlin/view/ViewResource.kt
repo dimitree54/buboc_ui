@@ -39,7 +39,7 @@ internal fun ViewResource(
         Text("Ingredient: ", style = MaterialTheme.typography.h5)
         PreviewIngredientCard(resource.ingredient)
         Text("Amount:", style = MaterialTheme.typography.h5)
-        Text(resource.amount.toString() + " " + resource.ingredient.measureUnit.name)
+        Text(resource.amount.toString() + " " + resource.ingredient.measureUnit.name.name)
         DeleteButton(false, onDelete)
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import cuboc.ingredient.Ingredient
 import utility.MeasureUnit
+import utility.Name
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -76,7 +77,7 @@ internal fun CreateIngredient(
 
         val readyToSave = ingredientName.isNotBlank() && measureUnitName.value.isNotBlank()
         SaveButton(readyToSave) {
-            onCreation(Ingredient(ingredientName, MeasureUnit(measureUnitName.value)))
+            onCreation(Ingredient(ingredientName, MeasureUnit(Name(measureUnitName.value))))
         }
     }
 }

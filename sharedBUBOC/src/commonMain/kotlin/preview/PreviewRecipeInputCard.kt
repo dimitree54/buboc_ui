@@ -9,7 +9,7 @@ import cuboc.ingredient.RecipeInput
 internal fun PreviewRecipeInputCard(recipeInput: RecipeInput) {
     PreviewCard(
         recipeInput.ingredient.name,
-        recipeInput.amount.toString() + " " + recipeInput.ingredient.measureUnit.name,
+        recipeInput.amount.toString() + " " + recipeInput.ingredient.measureUnit.name.name,
         RECIPE_INPUT_ICON
     )
 }

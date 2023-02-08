@@ -74,7 +74,7 @@ internal fun EditRecipeInputPrototype(
     Box(modifier = Modifier.border(BorderStroke(2.dp, Color.Black))) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(recipeOutputPrototype.ingredient.name, style = MaterialTheme.typography.h6)
-            Text("Amount (in ${recipeOutputPrototype.ingredient.measureUnit.name}): ")
+            Text("Amount (in ${recipeOutputPrototype.ingredient.measureUnit.name.name}): ")
             val keyboardController = LocalSoftwareKeyboardController.current
             TextField(
                 recipeOutputPrototype.amountText,

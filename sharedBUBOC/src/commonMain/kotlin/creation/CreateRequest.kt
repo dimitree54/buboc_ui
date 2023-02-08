@@ -74,7 +74,7 @@ internal fun CreateRequestForm(
                 }
             }
             Text(
-                text = "Amount(in ${ingredient.measureUnit.name}): ",
+                text = "Amount(in ${ingredient.measureUnit.name.name}): ",
                 style = MaterialTheme.typography.h5
             )
             val keyboardController = LocalSoftwareKeyboardController.current

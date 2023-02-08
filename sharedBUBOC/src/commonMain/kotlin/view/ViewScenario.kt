@@ -53,7 +53,7 @@ internal fun ViewScenario(
             )
         }
         Text(
-            text = "Requesting ${scenario.request.amount} ${scenario.request.ingredient.measureUnit.name} of ${scenario.request.ingredient.name}",
+            text = "Requesting ${scenario.request.amount} ${scenario.request.ingredient.measureUnit.name.name} of ${scenario.request.ingredient.name}",
             style = MaterialTheme.typography.h5
         )
         Text(text = "Input resources:", style = MaterialTheme.typography.h5)

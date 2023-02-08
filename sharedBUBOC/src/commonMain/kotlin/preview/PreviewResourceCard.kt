@@ -9,7 +9,7 @@ import cuboc_core.cuboc.database.UserResource
 internal fun PreviewResourceCard(resource: UserResource) {
     PreviewCard(
         resource.ingredient.name,
-        resource.amount.toString() + " " + resource.ingredient.measureUnit.name,
+        resource.amount.toString() + " " + resource.ingredient.measureUnit.name.name,
         RESOURCE_ICON
     )
 }
