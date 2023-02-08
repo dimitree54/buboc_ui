@@ -33,7 +33,7 @@ internal fun ViewResource(
                 tint = Color.Black
             )
             Text(
-                text = resource.ingredient.name, style = MaterialTheme.typography.h3
+                text = resource.ingredient.name.toString(), style = MaterialTheme.typography.h3
             )
         }
         Text("Ingredient: ", style = MaterialTheme.typography.h5)

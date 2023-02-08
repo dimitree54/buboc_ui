@@ -8,7 +8,7 @@ import cuboc.ingredient.RecipeOutput
 @Composable
 internal fun PreviewRecipeOutputCard(recipeOutput: RecipeOutput) {
     PreviewCard(
-        recipeOutput.ingredient.name,
+        recipeOutput.ingredient.name.toString(),
         recipeOutput.amount.toString() + " " + recipeOutput.ingredient.measureUnit,
         RECIPE_OUTPUT_ICON
     )

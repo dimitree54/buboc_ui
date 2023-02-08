@@ -30,6 +30,7 @@ import cuboc.recipe.Instruction
 import cuboc.recipe.Recipe
 import cuboc_core.cuboc.database.search.SearchRequest
 import cuboc_core.cuboc.database.search.SearchResult
+import utility.Name
 import kotlin.reflect.KSuspendFunction1
 
 enum class RecipeCreationState {
@@ -73,7 +74,7 @@ internal fun EditRecipeInputPrototype(
 ) {
     Box(modifier = Modifier.border(BorderStroke(2.dp, Color.Black))) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(recipeOutputPrototype.ingredient.name, style = MaterialTheme.typography.h6)
+            Text(recipeOutputPrototype.ingredient.name.toString(), style = MaterialTheme.typography.h6)
             Text("Amount (in ${recipeOutputPrototype.ingredient.measureUnit}): ")
             val keyboardController = LocalSoftwareKeyboardController.current
             TextField(
@@ -259,7 +260,7 @@ internal fun CreateRecipe(
                         durationMinutes != null && recipeName.value.isNotBlank() && recipeInputs.isNotEmpty() && recipeOutputs.isNotEmpty() && instructionsText.value.isNotBlank()
                     SaveButton(readyToSave) {
                         val recipe = Recipe(
-                            recipeName.value,
+                            Name(recipeName.value),
                             recipeInputs,
                             recipeOutputs,
                             Instruction(durationMinutes!!, utility.Text(instructionsText.value))

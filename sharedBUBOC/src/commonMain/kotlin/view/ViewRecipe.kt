@@ -34,7 +34,7 @@ internal fun ViewRecipe(
                 tint = Color.Black
             )
             Text(
-                text = recipe.name, style = MaterialTheme.typography.h3
+                text = recipe.name.toString(), style = MaterialTheme.typography.h3
             )
         }
         Text(text = "Inputs:", style = MaterialTheme.typography.h5)

@@ -70,7 +70,7 @@ internal fun CreateResourceForm(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = null,
                     )
-                    Text(ingredient.name, style = MaterialTheme.typography.h6)
+                    Text(ingredient.name.toString(), style = MaterialTheme.typography.h6)
                 }
             }
             Text(

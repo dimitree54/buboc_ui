@@ -77,7 +77,7 @@ internal fun CreateIngredient(
 
         val readyToSave = ingredientName.isNotBlank() && measureUnitName.value.isNotBlank()
         SaveButton(readyToSave) {
-            onCreation(Ingredient(ingredientName, MeasureUnit(Name(measureUnitName.value))))
+            onCreation(Ingredient(Name(ingredientName), MeasureUnit(Name(measureUnitName.value))))
         }
     }
 }
