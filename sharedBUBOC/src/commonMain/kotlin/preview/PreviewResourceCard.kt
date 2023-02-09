@@ -2,7 +2,7 @@ package preview
 
 import RESOURCE_ICON
 import androidx.compose.runtime.Composable
-import cuboc_core.cuboc.ingredient.UserResource
+import cuboc.ingredient.UserResource
 
 
 @Composable
