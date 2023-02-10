@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cuboc.recipe.ComplexRecipe
 import cuboc.recipe.Recipe
-import cuboc.recipe.Scenario
+import cuboc_core.cuboc.scenario.CraftingScenario
 import preview.PreviewPieceOfResource
 import preview.PreviewRecipeCard
 
@@ -34,7 +34,7 @@ internal fun PreviewComplexRecipe(recipe: Recipe) {
 
 @Composable
 internal fun ViewScenario(
-    scenario: Scenario,
+    scenario: CraftingScenario,
     onRequest: () -> Unit
 ) {
     Column(

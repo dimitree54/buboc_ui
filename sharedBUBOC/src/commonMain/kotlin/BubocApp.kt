@@ -12,14 +12,13 @@ import androidx.compose.ui.unit.dp
 import creation.CreateRecipe
 import creation.CreateRequest
 import creation.CreateResource
-import cuboc.ScenariosBuilder
 import cuboc.database.CUBOCDatabase
-import cuboc.recipe.Scenario
 import cuboc_core.cuboc.database.firebase.CUBOCFirebase
 import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
 import cuboc_core.cuboc.database.search.SearchType
+import cuboc_core.cuboc.scenario.CraftingScenario
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +31,7 @@ import view.ViewScenario
 @Composable
 internal fun BubocApp() {
     val database = CUBOCFirebase()
-    val scenariosBuilder = ScenariosBuilder(database, 5)
+    val scenariosBuilder = ScenarioBuilder(database, 5)
     MaterialTheme {
         Main(database, scenariosBuilder)
     }
@@ -78,10 +77,10 @@ internal fun ActionButtons(
 }
 
 @Composable
-internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenariosBuilder) {
+internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenarioBuilder) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
-    val scenario = remember { mutableStateOf<Scenario?>(null) }
+    val scenario = remember { mutableStateOf<CraftingScenario?>(null) }
     val createState = remember { mutableStateOf<CreateState?>(null) }
     val searchResults = remember { mutableStateListOf<SearchResult>() }
     val searchResultsListState = rememberLazyListState()
