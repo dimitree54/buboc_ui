@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.dp
 import creation.CreateRecipe
 import creation.CreateRequest
 import creation.CreateResource
-import cuboc.database.CUBOCDatabase
-import cuboc_core.cuboc.database.firebase.CUBOCFirebase
+import cuboc.database.CUBOCDatabaseClient
+import cuboc_core.cuboc.database.firebase.CUBOCFirebaseClient
 import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
@@ -30,7 +30,7 @@ import view.ViewScenario
 
 @Composable
 internal fun BubocApp() {
-    val database = CUBOCFirebase()
+    val database = CUBOCFirebaseClient()
     val scenariosBuilder = ScenarioBuilder(database, 5)
     MaterialTheme {
         Main(database, scenariosBuilder)
@@ -77,7 +77,7 @@ internal fun ActionButtons(
 }
 
 @Composable
-internal fun Main(database: CUBOCDatabase, scenariosBuilder: ScenarioBuilder) {
+internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuilder) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
     val scenario = remember { mutableStateOf<CraftingScenario?>(null) }
