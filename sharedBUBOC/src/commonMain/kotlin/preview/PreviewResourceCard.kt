@@ -2,14 +2,14 @@ package preview
 
 import RESOURCE_ICON
 import androidx.compose.runtime.Composable
-import cuboc.ingredient.UserResource
+import cuboc.ingredient.Resource
 
 
 @Composable
-internal fun PreviewResourceCard(resource: UserResource) {
+internal fun PreviewResourceCard(resource: Resource) {
     PreviewCard(
-        resource.resource.ingredient.name.toString(),
-        resource.resource.amount.toString() + " " + resource.resource.ingredient.measureUnit,
+        resource.ingredient.name.toString(),
+        resource.amount.toString() + " " + resource.ingredient.measureUnit,
         RESOURCE_ICON
     )
 }

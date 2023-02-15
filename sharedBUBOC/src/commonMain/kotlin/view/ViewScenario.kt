@@ -10,31 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cuboc.recipe.ComplexRecipe
-import cuboc.recipe.Recipe
-import cuboc_core.cuboc.scenario.CraftingScenario
-import preview.PreviewPieceOfResource
+import cuboc.ingredient.Resource
+import cuboc.scenario.Scenario
 import preview.PreviewRecipeCard
+import preview.PreviewResourceCard
 
 
 @Composable
-internal fun PreviewComplexRecipe(recipe: Recipe) {
-    when (recipe) {
-        // is TrivialRecipe -> {}
-        is ComplexRecipe -> {
-            for (stage in recipe.stages) {
-                PreviewComplexRecipe(stage)
-            }
-        }
-
-        else -> PreviewRecipeCard(recipe)
-    }
-}
-
-
-@Composable
-internal fun ViewScenario(
-    scenario: CraftingScenario,
+internal fun ViewRequestAndScenario(
+    request: Resource,
+    scenario: Scenario,
     onRequest: () -> Unit
 ) {
     Column(
@@ -53,15 +38,17 @@ internal fun ViewScenario(
             )
         }
         Text(
-            text = "Requesting ${scenario.request.amount} ${scenario.request.ingredient.measureUnit} of ${scenario.request.ingredient.name}",
+            text = "Requesting ${request.amount} ${request.ingredient.measureUnit} of ${request.ingredient.name}",
             style = MaterialTheme.typography.h5
         )
         Text(text = "Input resources:", style = MaterialTheme.typography.h5)
-        for (pieceOfResource in scenario.resources.values.flatten()) {
-            PreviewPieceOfResource(pieceOfResource)
+        for (resource in scenario.externalResourcesRequired.values.flatten()) {
+            PreviewResourceCard(resource)
         }
         Text(text = "Scenario:", style = MaterialTheme.typography.h5)
-        PreviewComplexRecipe(scenario.recipe)
+        for (stage in scenario.stages) {
+            PreviewRecipeCard(stage.recipe)
+        }
         Button(
             shape = RoundedCornerShape(50),
             onClick = onRequest,

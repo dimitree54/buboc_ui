@@ -12,13 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cuboc.ingredient.UserResource
+import cuboc.ingredient.PieceOfUserResource
 import preview.PreviewIngredientCard
 
 
 @Composable
 internal fun ViewResource(
-    resource: UserResource,
+    resource: PieceOfUserResource,
     onDelete: () -> Unit
 ) {
     Column(

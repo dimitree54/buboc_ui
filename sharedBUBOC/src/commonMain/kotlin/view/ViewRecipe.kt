@@ -12,14 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cuboc_core.cuboc.recipe.UserRecipe
+import cuboc.recipe.UserRecipe
 import preview.PreviewRecipeInputCard
 import preview.PreviewRecipeOutputCard
 
 
 @Composable
 internal fun ViewRecipe(
-    recipe: UserRecipe,
+    userRecipe: UserRecipe,
     onDelete: () -> Unit
 ) {
     Column(
@@ -34,22 +34,22 @@ internal fun ViewRecipe(
                 tint = Color.Black
             )
             Text(
-                text = recipe.name.toString(), style = MaterialTheme.typography.h3
+                text = userRecipe.recipe.name.toString(), style = MaterialTheme.typography.h3
             )
         }
         Text(text = "Inputs:", style = MaterialTheme.typography.h5)
-        recipe.inputs.forEach {
+        userRecipe.inputs.forEach {
             PreviewRecipeInputCard(it)
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Instructions:", style = MaterialTheme.typography.h5)
-        Text(text = recipe.instruction.text.toString())
+        Text(text = userRecipe.recipe.instruction.text.toString())
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Duration:", style = MaterialTheme.typography.h5)
-        Text(text = recipe.instruction.durationMinutes.toString() + " minutes")
+        Text(text = userRecipe.recipe.instruction.durationMinutes.toString() + " minutes")
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Outputs:", style = MaterialTheme.typography.h5)
-        recipe.outputs.forEach {
+        userRecipe.outputs.forEach {
             PreviewRecipeOutputCard(it)
         }
         DeleteButton(false, onDelete)

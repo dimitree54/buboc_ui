@@ -13,27 +13,32 @@ import creation.CreateRecipe
 import creation.CreateRequest
 import creation.CreateResource
 import cuboc.database.CUBOCDatabaseClient
-import cuboc_core.cuboc.database.firebase.CUBOCFirebaseClient
+import cuboc.database.firebase.CUBOCFirebaseAdmin
+import cuboc.database.firebase.CUBOCFirebaseClient
+import cuboc.ingredient.Resource
+import cuboc.scenario.Scenario
+import cuboc.scenario.ScenarioBuilder
 import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
 import cuboc_core.cuboc.database.search.SearchType
-import cuboc_core.cuboc.scenario.CraftingScenario
+import cuboc_core.utility.IdGenerator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import search.SearchField
 import search.SearchResultsList
 import view.ViewRecipe
+import view.ViewRequestAndScenario
 import view.ViewResource
-import view.ViewScenario
 
 @Composable
 internal fun BubocApp() {
-    val database = CUBOCFirebaseClient()
-    val scenariosBuilder = ScenarioBuilder(database, 5)
+    val databaseClient = CUBOCFirebaseClient()
+    val databaseAdmin = CUBOCFirebaseAdmin()
+    val scenariosBuilder = ScenarioBuilder(databaseClient, 5, IdGenerator())
     MaterialTheme {
-        Main(database, scenariosBuilder)
+        Main(databaseClient, databaseAdmin, scenariosBuilder)
     }
 }
 
@@ -77,10 +82,14 @@ internal fun ActionButtons(
 }
 
 @Composable
-internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuilder) {
+internal fun Main(
+    databaseClient: CUBOCDatabaseClient,
+    databaseAdmin: CUBOCFirebaseAdmin,
+    scenariosBuilder: ScenarioBuilder
+) {
     val state = remember { mutableStateOf(BubocState.SEARCH) }
     val viewItem = remember { mutableStateOf<SearchResult?>(null) }
-    val scenario = remember { mutableStateOf<CraftingScenario?>(null) }
+    val requestAndScenario = remember { mutableStateOf<Pair<Resource, Scenario>?>(null) }
     val createState = remember { mutableStateOf<CreateState?>(null) }
     val searchResults = remember { mutableStateListOf<SearchResult>() }
     val searchResultsListState = rememberLazyListState()
@@ -109,7 +118,7 @@ internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuild
                     searchingCoroutine?.cancel()
                     searchingCoroutine = coroutineScope.launch {
                         delay(1000)
-                        val found = database.search(it)
+                        val found = databaseClient.search(it)
                         searchResults.clear()
                         searchResults.addAll(found)
                     }
@@ -123,35 +132,40 @@ internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuild
             BubocState.CREATE -> {
                 when (createState.value) {
                     CreateState.Resource -> CreateResource(
-                        searchForIngredient = database::search,
+                        searchForIngredient = databaseClient::search,
                         onCancel = { state.value = BubocState.SEARCH }
                     ) { newResource ->
                         state.value = BubocState.LOADING
                         searchResults.clear()
                         coroutineScope.launch {
-                            database.addResource(newResource)
+                            databaseClient.addResource(newResource)
                             state.value = BubocState.SEARCH
                         }
                     }
 
                     CreateState.Recipe -> CreateRecipe(
-                        searchForIngredient = database::search,
+                        searchForIngredient = databaseClient::search,
                         onCancel = { state.value = BubocState.SEARCH }
                     ) { recipe ->
                         state.value = BubocState.LOADING
                         searchResults.clear()
                         coroutineScope.launch {
-                            database.addRecipe(recipe)
+                            databaseClient.addRecipe(recipe)
                             state.value = BubocState.SEARCH
                         }
                     }
 
                     CreateState.Request -> CreateRequest(
-                        searchForIngredient = database::search,
+                        searchForIngredient = databaseClient::search,
                         onCancel = { state.value = BubocState.SEARCH }
                     ) { request ->
                         coroutineScope.launch {
-                            scenario.value = scenariosBuilder.searchForBestScenario(request)
+                            val scenario = scenariosBuilder.searchForBestScenario(request)
+                            if (scenario != null) {
+                                requestAndScenario.value = request to scenario
+                            } else {
+                                requestAndScenario.value = null
+                            }
                             state.value = BubocState.REQUEST
                         }
                     }
@@ -169,19 +183,19 @@ internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuild
                     state.value = BubocState.SEARCH
                 }
                 when (val item = viewItem.value) {
-                    is ResourceSearchResult -> ViewResource(item.resource) {
+                    is ResourceSearchResult -> ViewResource(item.pieceOfUserResource) {
                         searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
-                            database.removeResource(item.resource)
+                            databaseAdmin.removeResource(item.pieceOfUserResource.userResource)
                         }
                     }
 
-                    is RecipeSearchResult -> ViewRecipe(item.recipe) {
+                    is RecipeSearchResult -> ViewRecipe(item.userRecipe) {
                         searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
-                            database.removeRecipe(item.recipe)
+                            databaseAdmin.removeRecipe(item.userRecipe)
                         }
                     }
 
@@ -191,18 +205,19 @@ internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuild
 
             BubocState.REQUEST -> {
                 BackButton {
-                    scenario.value = null
+                    requestAndScenario.value = null
                     state.value = BubocState.SEARCH
                 }
-                if (scenario.value == null) {
+                if (requestAndScenario.value == null) {
                     Text("Request can not be produced")
                 } else {
-                    ViewScenario(scenario.value!!) {
+                    val (request, scenario) = requestAndScenario.value!!
+                    ViewRequestAndScenario(request, scenario) {
                         searchResults.clear()
                         state.value = BubocState.SEARCH
                         coroutineScope.launch {
-                            database.execute(scenario.value!!, "test_user")
-                            scenario.value = null
+                            databaseAdmin.launchScenario(listOf(request), scenario)
+                            requestAndScenario.value = null
                             state.value = BubocState.SEARCH
                         }
                     }

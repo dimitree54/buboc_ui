@@ -18,8 +18,8 @@ import cuboc_core.cuboc.database.search.RecipeSearchResult
 import cuboc_core.cuboc.database.search.ResourceSearchResult
 import cuboc_core.cuboc.database.search.SearchResult
 import preview.PreviewIngredientCard
-import preview.PreviewRecipeCard
-import preview.PreviewResourceCard
+import preview.PreviewPieceOfResource
+import preview.PreviewUserRecipeCard
 
 
 @Composable
@@ -45,8 +45,8 @@ internal fun SearchResultsList(
                     ) {
                         when (result) {
                             is IngredientSearchResult -> PreviewIngredientCard(result.ingredient)
-                            is RecipeSearchResult -> PreviewRecipeCard(result.recipe)
-                            is ResourceSearchResult -> PreviewResourceCard(result.resource)
+                            is RecipeSearchResult -> PreviewUserRecipeCard(result.userRecipe)
+                            is ResourceSearchResult -> PreviewPieceOfResource(result.pieceOfUserResource)
                         }
                     }
                 }
