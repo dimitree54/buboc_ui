@@ -70,7 +70,7 @@ internal fun SearchOrCreateIngredient(
         when (state.value) {
             SearchOrCreateIngredientState.Search -> {
                 var searchingCoroutine: Job? by remember { mutableStateOf(null) }
-                SearchField(SearchType.Ingredients, searchQuery) {
+                SearchField(SearchType.SmartIngredients, searchQuery) {
                     searchingCoroutine?.cancel()
                     searchingCoroutine = coroutineScope.launch {
                         delay(1000)

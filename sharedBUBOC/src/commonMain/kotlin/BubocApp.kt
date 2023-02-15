@@ -105,7 +105,7 @@ internal fun Main(database: CUBOCDatabaseClient, scenariosBuilder: ScenarioBuild
                     }
                 )
                 var searchingCoroutine: Job? by remember { mutableStateOf(null) }
-                SearchField(SearchType.All) {
+                SearchField(SearchType.SmartAll) {
                     searchingCoroutine?.cancel()
                     searchingCoroutine = coroutineScope.launch {
                         delay(1000)

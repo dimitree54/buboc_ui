@@ -42,8 +42,8 @@ internal fun SearchField(
                 SearchType.RecipesByOutput -> "Search for recipes by output"
                 SearchType.RecipesByName -> "Search for recipes"
                 SearchType.Resources -> "Search for resources"
-                SearchType.Ingredients -> "Search for ingredients"
-                SearchType.All -> "Search for recipes and resources"
+                SearchType.SmartIngredients -> "Search for ingredients"
+                SearchType.SmartAll -> "Search for recipes and resources"
             }
             Text(placeholderText)
         },
